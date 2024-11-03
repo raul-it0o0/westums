@@ -5,28 +5,31 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class LoginScreen extends JPanel implements ActionListener {
+public class LoginAsFrame extends LoginFrame implements ActionListener {
 
     public JButton studentButton;
     public JButton professorButton;
 
-    public LoginScreen() {
-        super();
-        setOpaque(false);
+    public LoginAsFrame() {
+        super("Login Screen");
+
+        JPanel panel = new JPanel();
+        panel.setOpaque(false);
+
         JLabel label = new JLabel("Login as:");
         label.setForeground(Color.red);
         label.setFont(new Font("Arial", Font.ITALIC, 20));
-//        label.setHorizontalAlignment(SwingConstants.RIGHT);
-        add(label);
+        label.setHorizontalAlignment(SwingConstants.RIGHT);
 
         studentButton = new JButton("Student");
         studentButton.addActionListener(this);
         professorButton = new JButton("Professor");
         professorButton.addActionListener(this);
 
-        add(studentButton);
-        add(professorButton);
-
+        panel.add(label);
+        panel.add(studentButton);
+        panel.add(professorButton);
+        super.add(panel);
         setVisible(true);
     }
 
@@ -34,15 +37,13 @@ public class LoginScreen extends JPanel implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == studentButton) {
             // If an action (i.e. pressing) was performed with the studentButton
-            System.out.println("Student Button pressed");
-            this.setVisible(false);
-            StudentLogin studentLogin = new StudentLogin();
-            studentLogin.setVisible(true);
+            setVisible(false);
+            StudentLoginFrame studentLoginFrame = new StudentLoginFrame();
+            studentLoginFrame.setVisible(true);
         }
         else if (e.getSource() == professorButton) {
-            System.out.println("Professor Button pressed");
-            this.setVisible(false);
-            ProfessorPanel professorPanel = new ProfessorPanel();
+            setVisible(false);
+            ProfessorLoginFrame professorPanel = new ProfessorLoginFrame();
             professorPanel.setVisible(true);
         }
     }
