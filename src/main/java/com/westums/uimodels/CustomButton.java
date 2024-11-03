@@ -1,10 +1,10 @@
-package org.example.uimodels;
+package com.westums.uimodels;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class Button extends JButton {
-    public Button(String text) {
+public class CustomButton extends JButton {
+    public CustomButton(String text) {
         super(text);
         setFocusable(false);
         setFont(new Font("Arial", Font.PLAIN, 20));

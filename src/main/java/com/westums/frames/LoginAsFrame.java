@@ -1,4 +1,7 @@
-package org.example.uimodels;
+package com.westums.frames;
+
+import com.westums.uimodels.CustomButton;
+import com.westums.uimodels.LoginFrame;
 
 import javax.swing.*;
 import java.awt.*;
@@ -7,8 +10,8 @@ import java.awt.event.ActionListener;
 
 public class LoginAsFrame extends LoginFrame implements ActionListener {
 
-    public Button studentButton;
-    public Button professorButton;
+    public CustomButton studentButton;
+    public CustomButton professorButton;
 
     public LoginAsFrame() {
         super("Login Screen");
@@ -21,9 +24,9 @@ public class LoginAsFrame extends LoginFrame implements ActionListener {
         label.setFont(new Font("Arial", Font.ITALIC, 20));
         label.setHorizontalAlignment(SwingConstants.RIGHT);
 
-        studentButton = new Button("Student");
+        studentButton = new CustomButton("Student");
         studentButton.addActionListener(this);
-        professorButton = new Button("Professor");
+        professorButton = new CustomButton("Professor");
         professorButton.addActionListener(this);
 
         panel.add(label);
@@ -37,12 +40,12 @@ public class LoginAsFrame extends LoginFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == studentButton) {
             // If an action (i.e. pressing) was performed with the studentButton
-            setVisible(false);
+            dispose();
             StudentLoginFrame studentLoginFrame = new StudentLoginFrame();
             studentLoginFrame.setVisible(true);
         }
         else if (e.getSource() == professorButton) {
-            setVisible(false);
+            dispose();
             ProfessorLoginFrame professorPanel = new ProfessorLoginFrame();
             professorPanel.setVisible(true);
         }

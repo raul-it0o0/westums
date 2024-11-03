@@ -1,4 +1,4 @@
-package org.example;
+package com.westums;
 
 import org.ajbrown.namemachine.NameGenerator;
 
@@ -76,10 +76,6 @@ public class DataGenerator {
             preparedStatement.executeUpdate();
             Logger.getAnonymousLogger().info("ADDED STUDENT (studentID " + studentID + ")");
 
-//            conn.statement.executeUpdate(
-//                    "INSERT INTO westums.students " +
-//                            "VALUES(" + studentID + ',' + surname + ',' + name + ',' + dob + ',' + specialization + ")"
-//            );
         }
         catch (Exception e) {
             e.printStackTrace();

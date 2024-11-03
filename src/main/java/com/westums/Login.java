@@ -1,6 +1,6 @@
-package org.example;
+package com.westums;
 
-import org.example.uimodels.LoginAsFrame;
+import com.westums.frames.LoginAsFrame;
 
 public class Login {
 
