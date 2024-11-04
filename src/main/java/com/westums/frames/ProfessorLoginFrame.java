@@ -13,7 +13,7 @@ import java.sql.ResultSet;
 public class ProfessorLoginFrame extends LoginFrame implements ActionListener {
     JTextField nameField, surnameField;
     JPasswordField passwordField;
-    CustomButton loginButton;
+    CustomButton loginButton, backButton;
 
     public ProfessorLoginFrame() {
         super("Professor Login");
@@ -41,6 +41,10 @@ public class ProfessorLoginFrame extends LoginFrame implements ActionListener {
         loginButton = new CustomButton("Login");
         loginButton.addActionListener(this);
         panel.add(loginButton);
+
+        backButton = new CustomButton("<-");
+        backButton.addActionListener(this);
+        panel.add(backButton);
     }
 
     Professor searchForMatch(String name, String surname) {
@@ -58,7 +62,6 @@ public class ProfessorLoginFrame extends LoginFrame implements ActionListener {
 
             if (rs.next()) {
                 return new Professor(
-                        rs.getString(1),
                         rs.getString(2),
                         rs.getString(3),
                         rs.getDate(4),
@@ -87,6 +90,13 @@ public class ProfessorLoginFrame extends LoginFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == backButton) {
+            dispose();
+            LoginAsFrame previousFrame = new LoginAsFrame();
+            previousFrame.setVisible(true);
+            return;
+        }
+
         String name = nameField.getText().strip();
         String surname = surnameField.getText().strip();
         String password = String.valueOf(passwordField.getPassword()).strip();

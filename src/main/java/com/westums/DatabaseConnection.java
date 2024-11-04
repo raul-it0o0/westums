@@ -7,7 +7,6 @@ public class DatabaseConnection {
     public Connection connection;
     public Statement statement;
 
-
     // TODO: Make errors appear as JOptionPanes
 
     public DatabaseConnection() {
@@ -24,6 +23,9 @@ public class DatabaseConnection {
         try {
             String dbURL = "jdbc:mysql://localhost:3306/westums";
             this.connection = DriverManager.getConnection(dbURL, "root", " ");
+            statement = connection.createStatement();
+            statement.execute("USE westums");
+
         }
         catch (SQLException e) {
             System.out.printf("Error connecting to DB: %s", e.getMessage());

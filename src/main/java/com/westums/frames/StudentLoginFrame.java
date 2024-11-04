@@ -16,7 +16,7 @@ public class StudentLoginFrame extends LoginFrame implements ActionListener {
 
     JTextField studentIDField;
     JPasswordField passwordField;
-    CustomButton loginButton, noPasswordButton;
+    CustomButton loginButton, noPasswordButton, backButton;
 
     public StudentLoginFrame() {
         super("Student Login");
@@ -43,6 +43,10 @@ public class StudentLoginFrame extends LoginFrame implements ActionListener {
         noPasswordButton = new CustomButton("I don't have a password");
         noPasswordButton.addActionListener(this);
         panel.add(noPasswordButton);
+
+        backButton = new CustomButton("<-");
+        backButton.addActionListener(this);
+        panel.add(backButton);
     }
 
     Student searchForMatch(String studentID, String password) {
@@ -83,6 +87,13 @@ public class StudentLoginFrame extends LoginFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == backButton) {
+            dispose();
+            LoginAsFrame previousFrame = new LoginAsFrame();
+            previousFrame.setVisible(true);
+            return;
+        }
+
         String studentID = studentIDField.getText().strip();
         String password = String.valueOf(passwordField.getPassword()).strip();
 

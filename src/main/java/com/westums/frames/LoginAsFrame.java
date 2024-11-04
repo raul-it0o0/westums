@@ -12,6 +12,7 @@ public class LoginAsFrame extends LoginFrame implements ActionListener {
 
     public CustomButton studentButton;
     public CustomButton professorButton;
+    public CustomButton registerButton;
 
     public LoginAsFrame() {
         super("Login Screen");
@@ -28,10 +29,13 @@ public class LoginAsFrame extends LoginFrame implements ActionListener {
         studentButton.addActionListener(this);
         professorButton = new CustomButton("Professor");
         professorButton.addActionListener(this);
+        registerButton = new CustomButton("Register");
+        registerButton.addActionListener(this);
 
         panel.add(label);
         panel.add(studentButton);
         panel.add(professorButton);
+        panel.add(registerButton);
         super.add(panel);
         setVisible(true);
     }
@@ -48,6 +52,11 @@ public class LoginAsFrame extends LoginFrame implements ActionListener {
             dispose();
             ProfessorLoginFrame professorPanel = new ProfessorLoginFrame();
             professorPanel.setVisible(true);
+        }
+        else if (e.getSource() == registerButton) {
+            dispose();
+            RegisterFrame registerFrame = new RegisterFrame();
+            registerFrame.setVisible(true);
         }
     }
 }

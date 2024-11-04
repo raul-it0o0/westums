@@ -1,14 +1,13 @@
 package com.westums.models;
 
 public class Professor {
-    public String professorID, surname, name, password;
+    public String surname, name, password;
     public java.sql.Date dob;
 
-    public Professor(String professorID, String surname, String name, java.util.Date dob, String password) {
-        this.professorID = professorID;
+    public Professor(String surname, String name, java.sql.Date dob, String password) {
         this.surname = surname;
         this.name = name;
-        this.dob = new java.sql.Date(dob.getTime());
+        this.dob = dob;
         this.password = password;
     }
 
