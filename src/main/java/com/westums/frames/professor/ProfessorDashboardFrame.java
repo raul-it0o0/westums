@@ -4,6 +4,7 @@ import com.westums.models.Professor;
 import com.westums.uimodels.CustomButton;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionListener;
 
 public class ProfessorDashboardFrame extends JFrame {
 
@@ -13,6 +14,7 @@ public class ProfessorDashboardFrame extends JFrame {
 
     public ProfessorDashboardFrame(Professor loggedProfessor) {
         super("Professor Dashboard");
+        this.loggedProfessor = loggedProfessor;
 
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -25,12 +27,16 @@ public class ProfessorDashboardFrame extends JFrame {
         super.add(mainPanel);
 
         // Initialize the other panels in the cardLayout
-        ProfessorAddEnrollablePanel panelAddEnrollable = new ProfessorAddEnrollablePanel(loggedProfessor);
-        mainPanel.add(panelAddEnrollable);
+        JPanel panelDashboard = new JPanel();
+        mainPanel.add(panelDashboard, "Professor Dashboard");
+        cardLayout.show(mainPanel, "Professor Dashboard");
+        ActionListener backToDashboard = e -> cardLayout.show(mainPanel, "Professor Dashboard");
+        ProfessorAddEnrollablePanel panelAddEnrollable = new ProfessorAddEnrollablePanel(loggedProfessor, backToDashboard);
+        mainPanel.add(panelAddEnrollable, "Add Enrollable");
 
         btnAddEnrollable = new CustomButton("Add Enrollable");
-        mainPanel.add(btnAddEnrollable);
-        btnAddEnrollable.addActionListener(e -> cardLayout.show(panelAddEnrollable, "Add Enrollable"));
+        panelDashboard.add(btnAddEnrollable);
+        btnAddEnrollable.addActionListener(e -> cardLayout.show(mainPanel, "Add Enrollable"));
 
     }
 }
