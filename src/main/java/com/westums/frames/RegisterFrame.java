@@ -72,29 +72,28 @@ public class RegisterFrame extends LoginFrame implements ActionListener {
             return;
         }
 
-        String name = tfName.getText();
-        String surname = tfSurname.getText();
-        java.sql.Date dob;
-
-        try {
-            dob = getDateFromString(tfDOB.getText());
-        }
-        catch (ParseException ex) {
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Date is not in correct format (dd-mm-yyyy)!",
-                    "Error Message",
-                    JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-        String password = String.valueOf(pfPassword.getPassword());
-
         if (e.getSource() == pfPassword || e.getSource() == btnRegister) {
             // Make sure fields are not empty
-            if (name.isEmpty() || surname.isEmpty() || password.isEmpty()) {
+            String name = tfName.getText();
+            String surname = tfSurname.getText();
+            String dobString = tfDOB.getText();
+            String password = String.valueOf(pfPassword.getPassword());
+            if (name.isEmpty() || surname.isEmpty() || dobString.isEmpty() || password.isEmpty()) {
                 JOptionPane.showMessageDialog(
                         this,
                         "Fields must not be empty!",
+                        "Error Message",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            java.sql.Date dob;
+            try {
+                dob = getDateFromString(tfDOB.getText());
+            }
+            catch (ParseException ex) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Date is not in correct format (dd-mm-yyyy)!",
                         "Error Message",
                         JOptionPane.WARNING_MESSAGE);
                 return;

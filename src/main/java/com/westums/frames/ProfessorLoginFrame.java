@@ -1,5 +1,6 @@
 package com.westums.frames;
 import com.westums.DatabaseConnection;
+import com.westums.frames.professor.ProfessorDashboardFrame;
 import com.westums.models.Professor;
 import com.westums.uimodels.CustomButton;
 import com.westums.uimodels.LoginFrame;
@@ -117,9 +118,12 @@ public class ProfessorLoginFrame extends LoginFrame implements ActionListener {
             if (professor == null) {
                 resetFields();
                 return;
-            } else if (professor.name.equals(name) && professor.surname.equals(surname)) {
+            }
+            else if (professor.name.equals(name) && professor.surname.equals(surname)) {
                 if (professor.password.equals(password)) {
-                    System.out.println("Logged in!");
+                    dispose();
+                    ProfessorDashboardFrame dashboard = new ProfessorDashboardFrame(professor);
+                    dashboard.setVisible(true);
                 } else {
                     JOptionPane.showMessageDialog(this,
                             "Invalid password.",
