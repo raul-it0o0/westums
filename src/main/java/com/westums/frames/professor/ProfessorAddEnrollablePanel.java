@@ -14,15 +14,22 @@ import java.sql.SQLException;
 public class ProfessorAddEnrollablePanel extends JPanel implements ActionListener {
 
     Professor loggedProfessor;
-    JLabel lblCourseName, lblSpots, lblCredits, lblSemester, lblYear;
+    JLabel lblCourseName, lblCourseType, lblSpots, lblCredits, lblSemester, lblYear;
     JTextField txtCourseName, txtSpots, txtCredits, txtSemester, txtYear;
     CustomButton btnOK;
     ActionListener backToDashboard;
+    JComboBox<String> cmbxCourseType;
 
     public ProfessorAddEnrollablePanel(Professor loggedProfessor, ActionListener backToDashboard) {
         super.setOpaque(false);
         this.loggedProfessor = loggedProfessor;
         this.backToDashboard = backToDashboard;
+
+        lblCourseType = new JLabel("Course Type");
+        lblCourseType.setLabelFor(cmbxCourseType);
+        cmbxCourseType = new JComboBox<>(new String[]{"Lecture", "Seminar", "Laboratory"});
+        super.add(lblCourseType);
+        super.add(cmbxCourseType);
 
         lblCourseName = new JLabel("Course Name: ");
         txtCourseName = new JTextField(20);
@@ -63,7 +70,7 @@ public class ProfessorAddEnrollablePanel extends JPanel implements ActionListene
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == btnOK) {
             // Make sure fields are not empty
-            if (txtCourseName.getText().isEmpty() || txtSpots.getText().isEmpty() || txtCredits.getText().isEmpty() || txtSemester.getText().isEmpty() || txtYear.getText().isEmpty()) {
+            if (txtCourseName.getText().isEmpty() || txtSpots.getText().isEmpty() || txtCredits.getText().isEmpty() || txtSemester.getText().isEmpty() || txtYear.getText().isEmpty() || cmbxCourseType.getSelectedItem() == null) {
                 JOptionPane.showMessageDialog(
                         this,
                         "Fields must not be empty!",
@@ -73,6 +80,9 @@ public class ProfessorAddEnrollablePanel extends JPanel implements ActionListene
             }
 
             Integer spots, credits, semester, year;
+            String courseType = cmbxCourseType.getSelectedItem().toString();
+            String courseName = txtCourseName.getText();
+
             try {
                 spots = Integer.parseInt(txtSpots.getText());
                 credits = Integer.parseInt(txtCredits.getText());
@@ -157,15 +167,18 @@ public class ProfessorAddEnrollablePanel extends JPanel implements ActionListene
                 }
 
                 // 2. Insert course into courses table
-                query = "INSERT INTO courses(courseName, availableSpots, professorID, credits, semester, year) " +
-                        "VALUES(?, ?, ?, ?, ?, ?)";
+                query = "INSERT INTO courses(courseName, courseType, availableSpots, professorID, " +
+                        "credits, " +
+                        "semester, year) " +
+                        "VALUES(?, ?, ?, ?, ?, ?, ?)";
                 stmt = db.connection.prepareStatement(query);
                 stmt.setString(1, txtCourseName.getText());
-                stmt.setString(2, txtSpots.getText());
-                stmt.setString(3, professorID);
-                stmt.setInt(4, credits);
-                stmt.setInt(5, semester);
-                stmt.setInt(6, year);
+                stmt.setString(2, courseType);
+                stmt.setString(3, txtSpots.getText());
+                stmt.setString(4, professorID);
+                stmt.setInt(5, credits);
+                stmt.setInt(6, semester);
+                stmt.setInt(7, year);
                 stmt.executeUpdate();
 
                 // Return back to dashboard
