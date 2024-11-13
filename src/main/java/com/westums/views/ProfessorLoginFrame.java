@@ -1,7 +1,7 @@
-package com.westums.frames;
+package com.westums.views;
 import com.westums.DatabaseConnection;
-import com.westums.frames.professor.ProfessorDashboardFrame;
-import com.westums.models.Professor;
+import com.westums.views.professor.ProfessorDashboardFrame;
+import com.westums.models.*;
 import com.westums.uimodels.CustomButton;
 import com.westums.uimodels.LoginFrame;
 
@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class ProfessorLoginFrame extends LoginFrame implements ActionListener {
     JTextField nameField, surnameField;
@@ -49,6 +50,9 @@ public class ProfessorLoginFrame extends LoginFrame implements ActionListener {
     }
 
     Professor searchForMatch(String name, String surname) {
+        int professorID;
+        Professor professor;
+
         try {
             DatabaseConnection db = new DatabaseConnection();
 
@@ -62,12 +66,12 @@ public class ProfessorLoginFrame extends LoginFrame implements ActionListener {
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
-                return new Professor(
+                professor = new Professor(
                         rs.getString(2),
                         rs.getString(3),
                         rs.getDate(4),
-                        rs.getString(5)
-                );
+                        rs.getString(5));
+                professorID = rs.getInt(1);
             }
             else {
                 JOptionPane.showMessageDialog(this,
@@ -87,6 +91,53 @@ public class ProfessorLoginFrame extends LoginFrame implements ActionListener {
                     JOptionPane.ERROR_MESSAGE);
             return null;
         }
+
+        // Load the professor's taught courses into the Professor object
+        try {
+            DatabaseConnection db = new DatabaseConnection();
+            // function that returns an enrollable implementation based on the enrollableType variable
+            String query = "SELECT courseName, courseType, availableSpots, credits, semester, year " +
+                    "FROM courses " +
+                    "WHERE professorID = ?";
+            PreparedStatement stmt = db.connection.prepareStatement(query);
+            stmt.setInt(1, professorID);
+            ResultSet rs = stmt.executeQuery();
+
+            String enrollableName, enrollableType;
+            int spots, credits, semester, year;
+            while (rs.next()) {
+                enrollableName = rs.getString(1);
+                enrollableType = rs.getString(2);
+                spots = rs.getInt(3);
+                credits = rs.getInt(4);
+                // TODO: semester and year are enum fields,
+                //  (i.e. stored as strings)
+                //  therefore they need to be
+                //  made into strings, then into int
+                semester = Integer.parseInt(rs.getString(5));
+                year = Integer.parseInt(rs.getString(6));
+                professor.addTaughtCourse(createEnrollableInstance(
+                        enrollableName,
+                        enrollableType,
+                        spots,
+                        credits,
+                        semester,
+                        year,
+                        professor
+                ));
+            }
+
+            return professor;
+        }
+        catch (SQLException e) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Error searching database. Try again.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            return null;
+        }
+
     }
 
     @Override
@@ -142,5 +193,52 @@ public class ProfessorLoginFrame extends LoginFrame implements ActionListener {
         passwordField.setText("");
     }
 
+    Enrollable createEnrollableInstance(
+            String enrollableName,
+            String courseType,
+            int spots,
+            int credits,
+            int semester,
+            int year,
+            Professor teachingProfessor
+    ) {
+        try {
+            return switch (courseType) {
+                case "Lecture" -> new Lecture(
+                        enrollableName,
+                        spots,
+                        credits,
+                        semester,
+                        year,
+                        teachingProfessor
+                );
+                case "Seminar" -> new Seminar(
+                        enrollableName,
+                        spots,
+                        credits,
+                        semester,
+                        year,
+                        teachingProfessor
+                );
+                case "Laboratory" -> new Laboratory(
+                        enrollableName,
+                        spots,
+                        credits,
+                        semester,
+                        year,
+                        teachingProfessor
+                );
+                default -> null;
+            };
+        }
+        catch (Exception e) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Error searching database. Try again.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            return null;
+        }
+    }
 
 }

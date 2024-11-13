@@ -1,4 +1,4 @@
-package com.westums.frames;
+package com.westums.views;
 
 import com.westums.DatabaseConnection;
 import com.westums.models.Student;
@@ -6,7 +6,6 @@ import com.westums.uimodels.CustomButton;
 import com.westums.uimodels.LoginFrame;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.PreparedStatement;

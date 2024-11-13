@@ -1,4 +1,4 @@
-package com.westums.frames;
+package com.westums.views;
 
 import com.westums.uimodels.CustomButton;
 import com.westums.uimodels.LoginFrame;

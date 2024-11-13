@@ -1,15 +1,16 @@
-package com.westums.frames;
+package com.westums.views;
 
 import com.westums.DatabaseConnection;
+import com.westums.views.professor.ProfessorDashboardFrame;
 import com.westums.models.Professor;
 import com.westums.uimodels.CustomButton;
 import com.westums.uimodels.LoginFrame;
+import com.westums.utils.*;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
@@ -61,8 +62,6 @@ public class RegisterFrame extends LoginFrame implements ActionListener {
         super.add(panel);
     }
 
-
-
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == btnBack) {
@@ -88,7 +87,7 @@ public class RegisterFrame extends LoginFrame implements ActionListener {
             }
             java.sql.Date dob;
             try {
-                dob = getDateFromString(tfDOB.getText());
+                dob = utils.getDateFromString(tfDOB.getText());
             }
             catch (ParseException ex) {
                 JOptionPane.showMessageDialog(
@@ -105,15 +104,12 @@ public class RegisterFrame extends LoginFrame implements ActionListener {
                 resetFields();
             }
             else {
-                System.out.println("Registered successfully!");
+                // Open professor dashboard
+                dispose();
+                ProfessorDashboardFrame dashboard = new ProfessorDashboardFrame(professor);
+                dashboard.setVisible(true);
             }
         }
-    }
-
-    java.sql.Date getDateFromString(String date) throws ParseException {
-        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
-        formatter.setLenient(false);
-        return new java.sql.Date(formatter.parse(date).getTime());
     }
 
     void resetFields() {

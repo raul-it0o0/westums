@@ -1,8 +1,12 @@
-package com.westums.frames.professor;
+package com.westums.views.professor;
 
 import com.westums.DatabaseConnection;
+import com.westums.models.Laboratory;
+import com.westums.models.Lecture;
 import com.westums.models.Professor;
+import com.westums.models.Seminar;
 import com.westums.uimodels.CustomButton;
+import com.westums.utils.ModelUpdateListener;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -10,6 +14,7 @@ import java.awt.event.ActionListener;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 
 public class ProfessorAddEnrollablePanel extends JPanel implements ActionListener {
 
@@ -19,11 +24,13 @@ public class ProfessorAddEnrollablePanel extends JPanel implements ActionListene
     CustomButton btnOK;
     ActionListener backToDashboard;
     JComboBox<String> cmbxCourseType;
+    ModelUpdateListener modelUpdateListener;
 
-    public ProfessorAddEnrollablePanel(Professor loggedProfessor, ActionListener backToDashboard) {
+    public ProfessorAddEnrollablePanel(Professor loggedProfessor, ActionListener backToDashboard, ModelUpdateListener modelUpdateListener) {
         super.setOpaque(false);
         this.loggedProfessor = loggedProfessor;
         this.backToDashboard = backToDashboard;
+        this.modelUpdateListener = modelUpdateListener;
 
         lblCourseType = new JLabel("Course Type");
         lblCourseType.setLabelFor(cmbxCourseType);
@@ -142,7 +149,7 @@ public class ProfessorAddEnrollablePanel extends JPanel implements ActionListene
                 DatabaseConnection db = new DatabaseConnection();
 
                 // 1. Find ProfessorID
-                String professorID;
+                int professorID;
                 String query = "SELECT professorID " +
                         "FROM professors " +
                         "WHERE surname = ? AND name = ? AND DOB = ?";
@@ -155,7 +162,7 @@ public class ProfessorAddEnrollablePanel extends JPanel implements ActionListene
 
 
                 if (rs.next()) {
-                    professorID = rs.getString("professorID");
+                    professorID = rs.getInt("professorID");
                 }
                 else {
                     JOptionPane.showMessageDialog(
@@ -175,15 +182,44 @@ public class ProfessorAddEnrollablePanel extends JPanel implements ActionListene
                 stmt.setString(1, txtCourseName.getText());
                 stmt.setString(2, courseType);
                 stmt.setString(3, txtSpots.getText());
-                stmt.setString(4, professorID);
+                stmt.setInt(4, professorID);
                 stmt.setInt(5, credits);
-                stmt.setInt(6, semester);
-                stmt.setInt(7, year);
+                // TODO: semester and year are enum fields,
+                //  (i.e. stored as strings)
+                //  therefore they need to be
+                //  made into strings
+                stmt.setString(6, semester.toString());
+                stmt.setString(7, year.toString());
                 stmt.executeUpdate();
+
+
+                // Add course into professor's taught courses collection
+                if (courseType.equals("Lecture"))
+                    loggedProfessor.addTaughtCourse(new Lecture(courseName, spots, credits, semester,
+                                year, loggedProfessor));
+                else if (courseType.equals("Seminar"))
+                    loggedProfessor.addTaughtCourse(new Seminar(courseName, spots, credits, semester,
+                            year, loggedProfessor));
+                else
+                    loggedProfessor.addTaughtCourse(new Laboratory(courseName, spots, credits, semester,
+                            year, loggedProfessor));
 
                 // Return back to dashboard
                 backToDashboard.actionPerformed(null);
 
+            }
+            catch (SQLIntegrityConstraintViolationException ex2) {
+                // This exception is thrown when
+                // the unique constraint is violated
+                // In courses table there is a
+                // composite unique constraint for the rows
+                // courseName and courseType
+                JOptionPane.showMessageDialog(this,
+                        "There already exists such a " + courseType +
+                                " with the same name in the database.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
             }
             catch (SQLException ex) {
                 JOptionPane.showMessageDialog(

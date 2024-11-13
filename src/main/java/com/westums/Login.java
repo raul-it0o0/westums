@@ -1,6 +1,6 @@
 package com.westums;
 
-import com.westums.frames.LoginAsFrame;
+import com.westums.views.LoginAsFrame;
 
 public class Login {
 
