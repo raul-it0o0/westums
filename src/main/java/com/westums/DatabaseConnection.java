@@ -22,7 +22,7 @@ public class DatabaseConnection {
 
         try {
             String dbURL = "jdbc:mysql://localhost:3306/westums";
-            this.connection = DriverManager.getConnection(dbURL, "root", " ");
+            this.connection = DriverManager.getConnection(dbURL, "root", "");
             statement = connection.createStatement();
             statement.execute("USE westums");
 

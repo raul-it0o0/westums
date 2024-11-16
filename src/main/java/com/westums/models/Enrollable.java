@@ -6,6 +6,9 @@ import java.util.ArrayList;
 
 public interface Enrollable {
 
+    // Construct enrollable from given courseName
+    public Enrollable getEnrollable(String name);
+
     public void addStudent(Student student);
     public ArrayList<Student> getStudentList();
     public String getName();

@@ -136,4 +136,51 @@ public class Laboratory implements Enrollable {
     public void setEnrolledStudents(boolean b) {
         this.hasEnrolledStudents = b;
     }
+
+    @Override
+    public Enrollable getEnrollable(String name) {
+        try {
+            DatabaseConnection db = new DatabaseConnection();
+            String query = "SELECT * " +
+                    "FROM courses " +
+                    "WHERE courseName = ?";
+            PreparedStatement stmt = db.connection.prepareStatement(query);
+            stmt.setString(1, name);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                return switch (rs.getString("courseType")) {
+                    case "Lecture" ->  new Lecture(
+                            name,
+                            rs.getInt("availableSpots"),
+                            rs.getInt("credits"),
+                            Integer.valueOf(rs.getString("semester")),
+                            Integer.valueOf(rs.getString("year")),
+                            null
+                    );
+                    case "Seminar" -> new Seminar(
+                            name,
+                            rs.getInt("availableSpots"),
+                            rs.getInt("credits"),
+                            Integer.valueOf(rs.getString("semester")),
+                            Integer.valueOf(rs.getString("year")),
+                            null
+                    );
+                    case "Laboratory" -> new Laboratory(
+                            name,
+                            rs.getInt("availableSpots"),
+                            rs.getInt("credits"),
+                            Integer.valueOf(rs.getString("semester")),
+                            Integer.valueOf(rs.getString("year")),
+                            null
+                    );
+                    default -> null;
+                };
+            }
+        }
+        catch (Exception e) {
+            return null;
+        }
+        return null;
+    }
 }
