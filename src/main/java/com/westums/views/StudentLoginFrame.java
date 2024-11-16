@@ -4,8 +4,12 @@ import com.westums.DatabaseConnection;
 import com.westums.models.Student;
 import com.westums.uimodels.CustomButton;
 import com.westums.uimodels.LoginFrame;
+import com.westums.views.student.StudentDashboardFrame;
+import com.westums.views.student.StudentPasswordCreationPanel;
 
+import javax.smartcardio.Card;
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.PreparedStatement;
@@ -16,36 +20,47 @@ public class StudentLoginFrame extends LoginFrame implements ActionListener {
     JTextField studentIDField;
     JPasswordField passwordField;
     CustomButton loginButton, noPasswordButton, backButton;
+    CardLayout cardLayout;
+    ActionListener back;
+    JPanel mainPanel;
 
     public StudentLoginFrame() {
         super("Student Login");
 
-        JPanel panel = new JPanel();
-        panel.setOpaque(false);
-        add(panel);
+        cardLayout = new CardLayout();
+        mainPanel = new JPanel(cardLayout);
+        mainPanel.setOpaque(false);
+        this.add(mainPanel);
+
+        JPanel loginPanel = new JPanel();
+        loginPanel.setOpaque(false);
+        mainPanel.add(loginPanel, "Student Login Panel");
+        cardLayout.show(mainPanel, "Student Login Panel");
+
+        back = e -> cardLayout.show(mainPanel, "Student Login Panel");
 
         JLabel studentIDLabel = new JLabel("Student ID:");
-        panel.add(studentIDLabel);
+        loginPanel.add(studentIDLabel);
         studentIDField = new JTextField(7);
-        panel.add(studentIDField);
+        loginPanel.add(studentIDField);
 
         JLabel passwordLabel = new JLabel("Password:");
-        panel.add(passwordLabel);
+        loginPanel.add(passwordLabel);
         passwordField = new JPasswordField(20);
         passwordField.addActionListener(this);
-        panel.add(passwordField);
+        loginPanel.add(passwordField);
 
         loginButton = new CustomButton("Login");
         loginButton.addActionListener(this);
-        panel.add(loginButton);
+        loginPanel.add(loginButton);
 
         noPasswordButton = new CustomButton("I don't have a password");
         noPasswordButton.addActionListener(this);
-        panel.add(noPasswordButton);
+        loginPanel.add(noPasswordButton);
 
         backButton = new CustomButton("<-");
         backButton.addActionListener(this);
-        panel.add(backButton);
+        loginPanel.add(backButton);
     }
 
     Student searchForMatch(String studentID, String password) {
@@ -113,8 +128,26 @@ public class StudentLoginFrame extends LoginFrame implements ActionListener {
                 resetFields();
                 return;
             }
+            else if (student.password == null) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "You do not have a password. Please click on the button to create one.",
+                        "Error Message",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
+            }
             else if (student.password.equals(password)) {
-                System.out.println("Logged in!");
+                dispose();
+                StudentDashboardFrame dashboard = new StudentDashboardFrame(student);
+                dashboard.setVisible(true);
+            }
+            else {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Invalid password.",
+                        "Error Message",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
             }
         }
         else if (e.getSource() == noPasswordButton) {
@@ -132,7 +165,11 @@ public class StudentLoginFrame extends LoginFrame implements ActionListener {
             Student student = searchForMatch(studentID, password);
 
             if (student == null) {
-                resetFields();
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Student ID not found.",
+                        "Error Message",
+                        JOptionPane.WARNING_MESSAGE);
                 return;
             }
 
@@ -145,8 +182,11 @@ public class StudentLoginFrame extends LoginFrame implements ActionListener {
             }
 
             else {
-                System.out.println("Password creation frame");
-                // StudentPasswordCreationFrame
+                StudentPasswordCreationPanel studentPasswordCreationPanel =
+                        new StudentPasswordCreationPanel(studentID, back);
+                mainPanel.add(studentPasswordCreationPanel, "Student Password Creation");
+                cardLayout.show(mainPanel, "Student Password Creation");
+                return;
             }
 
 
