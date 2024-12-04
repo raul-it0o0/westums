@@ -1,0 +1,40 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+application {
+    mainClass = 'com.westums.Login'
+}
+
+group = 'com.westums'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    implementation 'com.mysql:mysql-connector-j:9.1.0'
+    implementation 'org.ajbrown:name-machine:1.0.0'
+    implementation 'com.toedter:jcalendar:1.4'
+    implementation 'org.apache.commons:commons-lang3:3.17.0'
+    implementation 'org.swinglabs:swingx:1.6.1'
+    implementation 'org.mindrot:jbcrypt:0.4'
+    implementation 'com.miglayout:miglayout-swing:11.4.2'
+    implementation 'com.formdev:flatlaf-intellij-themes:3.5.2'
+
+
+
+
+
+
+
+
+}
+
+test {
+    useJUnitPlatform()
+}

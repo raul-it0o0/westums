@@ -1,5 +1,6 @@
-package com.westums;
+package com.westums.models;
 
+import javax.swing.*;
 import java.sql.*;
 
 public class DatabaseConnection {
@@ -9,27 +10,26 @@ public class DatabaseConnection {
 
     // TODO: Make errors appear as JOptionPanes
 
-    public DatabaseConnection() {
+    public DatabaseConnection() throws SQLException {
 
         // Check if MySQL JDBC driver is installed on the system
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
         }
-        catch (Exception e) {
-            System.out.printf("%s (Missing JDBC MySQL driver)", e.getMessage());
+        catch (ClassNotFoundException e) {
+            new JOptionPane("Missing database connectivity driver.",
+                    JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         try {
-            String dbURL = "jdbc:mysql://localhost:3306/westums";
+            String dbURL = "jdbc:mysql://localhost:3306/west_ums";
             this.connection = DriverManager.getConnection(dbURL, "root", "");
             statement = connection.createStatement();
-            statement.execute("USE westums");
-
+            statement.execute("USE west_ums");
         }
         catch (SQLException e) {
-            System.out.printf("Error connecting to DB: %s", e.getMessage());
-            return;
+            throw new SQLException("Error connecting to database");
         }
     }
 }
