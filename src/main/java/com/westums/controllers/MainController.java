@@ -7,6 +7,7 @@ public class MainController {
 
     MainFrame view;
     LoginPanelController loginPanelController;
+    AdminDashboardController adminDashboardController;
 
     private boolean userHadPassword;
     private boolean passwordFetched;
@@ -20,6 +21,7 @@ public class MainController {
         // using the instances created in the view
         // (MainFrame, the parent of the card layout)
         this.loginPanelController = new LoginPanelController(view.loginPanel, view::showCard);
+        this.adminDashboardController = new AdminDashboardController(view.adminDashboard, view::showCard);
     }
 
 }

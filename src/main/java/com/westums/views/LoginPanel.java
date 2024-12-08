@@ -63,7 +63,8 @@ public class LoginPanel extends JPanel {
                     //---- welcomeLabel ----
                     welcomeLabel.setText("Welcome!");
                     welcomeLabel.setHorizontalAlignment(SwingConstants.CENTER);
-                    welcomeLabel.setFont(new Font("Inter", welcomeLabel.getFont().getStyle(), welcomeLabel.getFont().getSize() + 4));
+                    welcomeLabel.setFont(new Font("Inter 18pt", welcomeLabel.getFont().getStyle(),
+                            welcomeLabel.getFont().getSize() + 4));
                     welcomeLabel.setForeground(new Color(0x1e1e1e));
                     welcomeText.add(welcomeLabel);
                 }
@@ -84,7 +85,7 @@ public class LoginPanel extends JPanel {
 
                     //---- emailLabel ----
                     emailLabel.setText("Email");
-                    emailLabel.setFont(new Font("Inter", emailLabel.getFont().getStyle(), emailLabel.getFont().getSize() + 3));
+                    emailLabel.setFont(new Font("Inter 18pt", emailLabel.getFont().getStyle(), emailLabel.getFont().getSize() + 3));
                     emailLabel.setForeground(new Color(0x1e1e1e));
                     emailLabel.setBorder(null);
                     emailLabel.setMaximumSize(new Dimension(70, 15));
@@ -97,14 +98,14 @@ public class LoginPanel extends JPanel {
                     emailField.setForeground(new Color(0xb3b3b3));
                     emailField.setBackground(new Color(0x5a5a5a));
                     emailField.setSelectedTextColor(Color.white);
-                    emailField.setFont(new Font("Inter", Font.PLAIN, 15));
+                    emailField.setFont(new Font("Inter 18pt", Font.PLAIN, 15));
                     emailField.setMinimumSize(new Dimension(100, 40));
                     emailField.setMaximumSize(new Dimension(272, 40));
                     emailPanel.add(emailField, "cell 0 2");
 
                     //---- emailErrorLabel ----
                     emailErrorLabel.setText("Invalid email");
-                    emailErrorLabel.setFont(new Font("Inter", emailErrorLabel.getFont().getStyle(), emailErrorLabel.getFont().getSize() + 1));
+                    emailErrorLabel.setFont(new Font("Inter 18pt", emailErrorLabel.getFont().getStyle(), emailErrorLabel.getFont().getSize() + 1));
                     emailErrorLabel.setForeground(new Color(0x900b09));
                     emailErrorLabel.setBorder(null);
                     emailErrorLabel.setMaximumSize(new Dimension(70, 15));
@@ -131,7 +132,7 @@ public class LoginPanel extends JPanel {
 
                     //---- passwordLabel ----
                     passwordLabel.setText("Password");
-                    passwordLabel.setFont(new Font("Inter", passwordLabel.getFont().getStyle(), passwordLabel.getFont().getSize() + 3));
+                    passwordLabel.setFont(new Font("Inter 18pt", passwordLabel.getFont().getStyle(), passwordLabel.getFont().getSize() + 3));
                     passwordLabel.setForeground(new Color(0x1e1e1e));
                     passwordLabel.setBorder(null);
                     passwordLabel.setMaximumSize(new Dimension(70, 15));
@@ -141,7 +142,7 @@ public class LoginPanel extends JPanel {
 
                     //---- inputDescriptionLabel ----
                     inputDescriptionLabel.setText("Set a new password for your account");
-                    inputDescriptionLabel.setFont(new Font("Inter", inputDescriptionLabel.getFont().getStyle(), inputDescriptionLabel.getFont().getSize() + 1));
+                    inputDescriptionLabel.setFont(new Font("Inter 18pt", inputDescriptionLabel.getFont().getStyle(), inputDescriptionLabel.getFont().getSize() + 1));
                     inputDescriptionLabel.setForeground(new Color(0x757575));
                     inputDescriptionLabel.setBorder(null);
                     inputDescriptionLabel.setMaximumSize(new Dimension(70, 15));
@@ -155,14 +156,14 @@ public class LoginPanel extends JPanel {
                     passwordField.setForeground(new Color(0xb3b3b3));
                     passwordField.setBackground(new Color(0x5a5a5a));
                     passwordField.setSelectedTextColor(Color.white);
-                    passwordField.setFont(new Font("Inter", Font.PLAIN, 15));
+                    passwordField.setFont(new Font("Inter 18pt", Font.PLAIN, 15));
                     passwordField.setMinimumSize(new Dimension(100, 40));
                     passwordField.setMaximumSize(new Dimension(272, 40));
                     passwordPanel.add(passwordField, "cell 0 2");
 
                     //---- passwordErrorLabel ----
                     passwordErrorLabel.setText("Invalid password");
-                    passwordErrorLabel.setFont(new Font("Inter", passwordErrorLabel.getFont().getStyle(), passwordErrorLabel.getFont().getSize() + 1));
+                    passwordErrorLabel.setFont(new Font("Inter 18pt", passwordErrorLabel.getFont().getStyle(), passwordErrorLabel.getFont().getSize() + 1));
                     passwordErrorLabel.setForeground(new Color(0x900b09));
                     passwordErrorLabel.setBorder(null);
                     passwordErrorLabel.setMaximumSize(new Dimension(70, 15));
@@ -181,7 +182,7 @@ public class LoginPanel extends JPanel {
                     //---- button1 ----
                     signInButton.setText("Sign In");
 
-                    signInButton.setFont(new Font("Inter", Font.PLAIN, 15));
+                    signInButton.setFont(new Font("Inter 18pt", Font.PLAIN, 15));
                     buttonPanel.add(signInButton, BorderLayout.CENTER);
                 }
                 optionContainer.add(buttonPanel, "cell 0 3,gapy 17");

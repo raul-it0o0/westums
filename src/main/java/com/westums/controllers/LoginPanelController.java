@@ -8,10 +8,13 @@ import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.function.Consumer;
 
-public class LoginPanelController implements ActionListener, CaretListener {
+public class LoginPanelController implements ActionListener, CaretListener, ComponentListener {
 
     LoginPanel view;
     Consumer<String> showCardMethod;
@@ -31,26 +34,43 @@ public class LoginPanelController implements ActionListener, CaretListener {
         passwordFetched = false;
         hashedPassword = "";
 
+        registerAsListener();
+    }
+
+    private void registerAsListener() {
         // Register this controller as a listener
         //  to the components which need to be listened to
-        view.signInButton.addActionListener(this);
-        view.signInButton.setActionCommand("Sign In Button Pressed");
+        if (!Controller.isListenerOf(this, view.signInButton, ActionListener.class)) {
+            view.signInButton.addActionListener(this);
+            view.signInButton.setActionCommand("Sign In Button Pressed");
+        }
 
-        view.emailField.addActionListener(this);
-        view.emailField.setActionCommand("Email Field Filled");
+        if (!Controller.isListenerOf(this, view.passwordField, ActionListener.class)) {
+            view.passwordField.addActionListener(this);
+            view.passwordField.setActionCommand("Password Field Filled");
+        }
 
-        view.passwordField.addActionListener(this);
-        view.passwordField.setActionCommand("Password Field Filled");
+        if (!Controller.isListenerOf(this, view.emailField, ActionListener.class)) {
+            view.emailField.addActionListener(this);
+            view.emailField.setActionCommand("Email Field Filled");
+        }
 
-        view.emailField.addCaretListener(this);
-        view.passwordField.addCaretListener(this);
+        if (!Controller.isListenerOf(this, view.emailField, CaretListener.class)) {
+            view.emailField.addCaretListener(this);
+        }
 
+        if (!Controller.isListenerOf(this, view.passwordField, CaretListener.class)) {
+            view.passwordField.addCaretListener(this);
+        }
+
+        if (!Controller.isListenerOf(this, view, ComponentListener.class)) {
+            view.addComponentListener(this);
+        }
     }
 
     private void redirectView(AccountManager.UserType userType) {
         switch (userType) {
             case Admin:
-                System.out.println("Admin Dashboard");
                 showCardMethod.accept("Admin Dashboard");
                 break;
             case Professor:
@@ -121,9 +141,7 @@ public class LoginPanelController implements ActionListener, CaretListener {
                 view.emailField.setEditable(false);
                 view.passwordPanel.setVisible(true);
 
-                view.passwordField.addActionListener(this);
                 view.passwordField.requestFocus();
-                view.passwordField.setActionCommand("Sign In");
 
                 view.emailField.removeActionListener(this);
 
@@ -146,7 +164,6 @@ public class LoginPanelController implements ActionListener, CaretListener {
             String enteredPassword = new String(view.passwordField.getPassword());
             if (userHadPassword) {
                 if (AccountManager.isValidPassword(enteredPassword, hashedPassword)) {
-                    System.out.println("Correct Password");
                     redirectView(userType);
                     return;
                 }
@@ -180,4 +197,43 @@ public class LoginPanelController implements ActionListener, CaretListener {
             view.repaint();
         }
     }
+
+    @Override
+    public void componentResized(ComponentEvent e) {
+        return;
+    }
+
+    @Override
+    public void componentMoved(ComponentEvent e) {
+        return;
+    }
+
+    @Override
+    public void componentShown(ComponentEvent e) {
+        return;
+    }
+
+    @Override
+    public void componentHidden(ComponentEvent e) {
+        if (e.getSource() == view) {
+            resetViewFields();
+            passwordFetched = false;
+        }
+    }
+
+    private void resetViewFields() {
+        view.passwordPanel.setVisible(false);
+        view.inputDescriptionLabel.setVisible(false);
+        view.emailErrorLabel.setVisible(false);
+        view.passwordErrorLabel.setVisible(false);
+        view.emailField.setText(null);
+        view.passwordField.setText(null);
+        view.emailField.setEditable(true);
+
+        registerAsListener();
+
+        view.revalidate();
+        view.repaint();
+    }
+
 }

@@ -4,7 +4,8 @@ plugins {
 }
 
 application {
-    mainClass = 'com.westums.Login'
+    mainClass = 'com.westums.WestUMS'
+    applicationDefaultJvmArgs = ['-Dsun.java2d.uiScale=2']
 }
 
 group = 'com.westums'
@@ -25,11 +26,12 @@ dependencies {
     implementation 'org.mindrot:jbcrypt:0.4'
     implementation 'com.miglayout:miglayout-swing:11.4.2'
     implementation 'com.formdev:flatlaf-intellij-themes:3.5.2'
-
-
-
-
-
+    implementation 'com.jgoodies:jgoodies-forms:1.9.0'
+    implementation 'com.github.jiconfont:jiconfont-swing:1.0.1'
+    implementation 'com.github.jiconfont:jiconfont-typicons:2.0.7.1'
+    implementation 'com.github.jiconfont:jiconfont-font_awesome:4.7.0.1'
+    implementation 'org.kordamp.ikonli:ikonli-swing:12.3.1'
+    implementation 'org.kordamp.ikonli:ikonli-fontawesome-pack:12.3.1'
 
 
 

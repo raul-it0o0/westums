@@ -7,6 +7,7 @@ package com.westums.views;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.util.Arrays;
 
 public class MainFrame extends JFrame {
 
@@ -18,9 +19,15 @@ public class MainFrame extends JFrame {
     private void initUISettings() {
         try {
             UIManager.setLookAndFeel("com.formdev.flatlaf.intellijthemes.FlatDarkFlatIJTheme");
-            Font defaultFont = Font.createFont(Font.TRUETYPE_FONT,
+
+            Font Inter_18pt_Regular = Font.createFont(Font.TRUETYPE_FONT,
                     new File("src/main/resources/fonts/Inter_18pt-Regular.ttf")).deriveFont(12f);
-            UIManager.getLookAndFeelDefaults().put("defaultFont", defaultFont);
+            UIManager.getLookAndFeelDefaults().put("defaultFont", Inter_18pt_Regular);
+            GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(Inter_18pt_Regular);
+
+            Font Inter_18pt_Bold = Font.createFont(Font.TRUETYPE_FONT,
+                    new File("src/main/resources/fonts/Inter_18pt-Bold.ttf")).deriveFont(12f);
+            GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(Inter_18pt_Bold);
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -35,6 +42,7 @@ public class MainFrame extends JFrame {
     private void initComponents() {
         mainPanel = new JPanel();
         loginPanel = new LoginPanel();
+        adminDashboard = new AdminDashboard();
         cardLayout = new CardLayout();
 
         //======== this ========
@@ -50,6 +58,7 @@ public class MainFrame extends JFrame {
         {
             mainPanel.setLayout(cardLayout);
             mainPanel.add(loginPanel, "Login Panel");
+            mainPanel.add(adminDashboard, "Admin Dashboard");
 
             // Show the login panel as the first card
             cardLayout.show(mainPanel, "Login Panel");
@@ -66,6 +75,7 @@ public class MainFrame extends JFrame {
     // Generated using JFormDesigner Educational license - Raul Ariton (raul.ariton05)
     private JPanel mainPanel;
     public LoginPanel loginPanel;
+    public AdminDashboard adminDashboard;
     private CardLayout cardLayout;
     // JFormDesigner - End of variables declaration  //GEN-END:variables  @formatter:on
 }
