@@ -4,6 +4,8 @@
 
 package com.westums.views;
 
+import com.toedter.calendar.JCalendar;
+
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
@@ -28,6 +30,7 @@ public class MainFrame extends JFrame {
             Font Inter_18pt_Bold = Font.createFont(Font.TRUETYPE_FONT,
                     new File("src/main/resources/fonts/Inter_18pt-Bold.ttf")).deriveFont(12f);
             GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(Inter_18pt_Bold);
+
         }
         catch (Exception e) {
             e.printStackTrace();

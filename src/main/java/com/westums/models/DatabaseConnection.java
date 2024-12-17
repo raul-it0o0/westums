@@ -8,8 +8,6 @@ public class DatabaseConnection {
     public Connection connection;
     public Statement statement;
 
-    // TODO: Make errors appear as JOptionPanes
-
     public DatabaseConnection() throws SQLException {
 
         // Check if MySQL JDBC driver is installed on the system
@@ -17,9 +15,7 @@ public class DatabaseConnection {
             Class.forName("com.mysql.cj.jdbc.Driver");
         }
         catch (ClassNotFoundException e) {
-            new JOptionPane("Missing database connectivity driver.",
-                    JOptionPane.ERROR_MESSAGE);
-            return;
+            throw new RuntimeException("Missing database connectivity driver.");
         }
 
         try {

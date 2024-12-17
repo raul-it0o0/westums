@@ -11,7 +11,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.function.Consumer;
 
 public class LoginPanelController implements ActionListener, CaretListener, ComponentListener {
@@ -70,14 +69,16 @@ public class LoginPanelController implements ActionListener, CaretListener, Comp
 
     private void redirectView(AccountManager.UserType userType) {
         switch (userType) {
-            case Admin:
+            case ADMIN:
                 showCardMethod.accept("Admin Dashboard");
                 break;
-            case Professor:
+            case PROFESSOR:
                 showCardMethod.accept("Professor Dashboard");
+                System.out.println("Professor Dashboard");
                 break;
-            case Student:
+            case STUDENT:
                 showCardMethod.accept("Student Dashboard");
+                System.out.println("Student Dashboard");
                 break;
         }
     }
@@ -95,6 +96,9 @@ public class LoginPanelController implements ActionListener, CaretListener, Comp
         if (event.getActionCommand().equals("Sign In Button Pressed") ||
                 event.getActionCommand().equals("Email Field Filled") ||
                 event.getActionCommand().equals("Password Field Filled")) {
+            // Trim any whitespace
+            view.emailField.setText(view.emailField.getText().trim());
+            view.passwordField.setText(new String(view.passwordField.getPassword()).trim());
             if (view.emailField.getText().isEmpty()) {
                 // Display error message
                 view.emailErrorLabel.setVisible(true);
@@ -214,8 +218,8 @@ public class LoginPanelController implements ActionListener, CaretListener, Comp
     }
 
     @Override
-    public void componentHidden(ComponentEvent e) {
-        if (e.getSource() == view) {
+    public void componentHidden(ComponentEvent event) {
+        if (event.getSource() == view) {
             resetViewFields();
             passwordFetched = false;
         }
