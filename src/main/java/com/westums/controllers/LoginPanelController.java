@@ -1,6 +1,6 @@
 package com.westums.controllers;
 
-import com.westums.models.AccountManager;
+import com.westums.models.DatabaseManager;
 import com.westums.views.LoginPanel;
 
 import javax.swing.*;
@@ -22,7 +22,7 @@ public class LoginPanelController implements ActionListener, CaretListener, Comp
     private boolean userHadPassword;
     private boolean passwordFetched;
     private String hashedPassword;
-    private AccountManager.UserType userType;
+    private DatabaseManager.AccountType accountType;
 
     public LoginPanelController(LoginPanel loginPanelInstance, Consumer<String> switchCard) {
         this.view = loginPanelInstance;
@@ -67,8 +67,8 @@ public class LoginPanelController implements ActionListener, CaretListener, Comp
         }
     }
 
-    private void redirectView(AccountManager.UserType userType) {
-        switch (userType) {
+    private void redirectView(DatabaseManager.AccountType accountType) {
+        switch (accountType) {
             case ADMIN:
                 showCardMethod.accept("Admin Dashboard");
                 break;
@@ -119,10 +119,10 @@ public class LoginPanelController implements ActionListener, CaretListener, Comp
                 String enteredEmail = view.emailField.getText();
                 ArrayList<Object> list;
                 try {
-                    list = AccountManager.isValidEmail(enteredEmail);
+                    list = DatabaseManager.isValidEmail(enteredEmail);
                     if (list != null) {
                         hashedPassword = (String) list.get(0);
-                        userType = AccountManager.UserType.valueOf(String.valueOf(list.get(1)));
+                        accountType = DatabaseManager.AccountType.valueOf(String.valueOf(list.get(1)));
                     }
                 }
                 catch (java.sql.SQLException SQLException) {
@@ -167,8 +167,8 @@ public class LoginPanelController implements ActionListener, CaretListener, Comp
             String enteredEmail = view.emailField.getText();
             String enteredPassword = new String(view.passwordField.getPassword());
             if (userHadPassword) {
-                if (AccountManager.isValidPassword(enteredPassword, hashedPassword)) {
-                    redirectView(userType);
+                if (DatabaseManager.isValidPassword(enteredPassword, hashedPassword)) {
+                    redirectView(accountType);
                     return;
                 }
 
@@ -179,8 +179,8 @@ public class LoginPanelController implements ActionListener, CaretListener, Comp
             }
             else {
                 try {
-                    AccountManager.insertPassword(enteredEmail, enteredPassword);
-                    redirectView(userType);
+                    DatabaseManager.insertPassword(enteredEmail, enteredPassword);
+                    redirectView(accountType);
                 }
                 catch (java.sql.SQLException SQLException) {
                     new JOptionPane(SQLException.getMessage(), JOptionPane.ERROR_MESSAGE);

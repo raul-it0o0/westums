@@ -1,6 +1,6 @@
 package com.westums.controllers;
 
-import com.westums.models.AccountManager;
+import com.westums.models.DatabaseManager;
 import com.westums.models.DatabaseConnection;
 import com.westums.views.MainFrame;
 
@@ -15,7 +15,7 @@ public class MainController {
     private boolean userHadPassword;
     private boolean passwordFetched;
     private String hashedPassword;
-    private AccountManager.UserType userType;
+    private DatabaseManager.AccountType accountType;
 
     public MainController(MainFrame mainFrameInstance) {
         this.view = mainFrameInstance;

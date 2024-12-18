@@ -9,10 +9,34 @@ import java.util.Date;
 
 import org.mindrot.jbcrypt.BCrypt;
 
-public class AccountManager {
+public class DatabaseManager {
 
     private final static String EMAIL_DOMAIN = "e-uvt.ro";
-    public enum UserType {
+
+    /**
+     * Search the database for matches to the email
+     * @return True if a match to the email is found, false otherwise
+     * @throws SQLException if any error occurs while querying the database
+     */
+    public static boolean isValidProfessorEmail(String email) throws SQLException {
+        try {
+            DatabaseConnection db = new DatabaseConnection();
+
+            String query = "SELECT * " +
+                    "FROM Professors " +
+                    "WHERE Email = ?";
+            PreparedStatement stmt = db.connection.prepareStatement(query);
+            stmt.setString(1, email);
+            ResultSet rs = stmt.executeQuery();
+
+            return rs.next();
+        }
+        catch (SQLException e) {
+            throw new SQLException(e.getMessage());
+        }
+    }
+
+    public enum AccountType {
         PROFESSOR,
         STUDENT,
         ADMIN
@@ -267,20 +291,20 @@ public class AccountManager {
             if (!rs.next()) return null;
 
             String password = rs.getString("Pass");
-            UserType userType = UserType.valueOf(rs.getString("UserType").toUpperCase());
+            AccountType accountType = AccountType.valueOf(rs.getString("UserType").toUpperCase());
 
             // Matching email is found, but no password is set for the account
             if (password == null) {
                 ArrayList<Object> list = new ArrayList<>();
                 list.add("null");
-                list.add(userType);
+                list.add(accountType);
                 return list;
             }
 
             // Matching email is found with password
             ArrayList<Object> list = new ArrayList<>();
             list.add(password);
-            list.add(userType);
+            list.add(accountType);
             return list;
         }
         catch (SQLException e) {
@@ -321,11 +345,11 @@ public class AccountManager {
      * Create a new account of type `userType` and insert it into the database,
      * with a <code>null</code> password.
      * @param email The email of the account to be added
-     * @param userType The type of the account to be added
+     * @param accountType The type of the account to be added
      *                 (<code>PROFESSOR</code>, <code>STUDENT</code> or <code>ADMIN</code>)
      * @throws SQLException if any error occurs while querying the database.
      */
-    public static void createAccount(String email, UserType userType) throws SQLException {
+    public static void createAccount(String email, AccountType accountType) throws SQLException {
         try {
             DatabaseConnection db = new DatabaseConnection();
 
@@ -333,7 +357,7 @@ public class AccountManager {
                     "VALUES (?, ?)";
             PreparedStatement stmt = db.connection.prepareStatement(query);
             stmt.setString(1, email);
-            stmt.setString(2, userType.toString());
+            stmt.setString(2, accountType.toString());
             stmt.executeUpdate();
         }
         catch (SQLException e) {
@@ -385,7 +409,24 @@ public class AccountManager {
         }
     }
 
+    /**
+     * Insert a new record in the `Courses` table.
+     * @throws SQLException if any error occurs while querying the database
+     */
+    public static void addCourse(String name, String professorEmail, String courseType) throws SQLException {
+        try {
+            DatabaseConnection db = new DatabaseConnection();
 
-
+            String query = "INSERT INTO Courses(ProfessorID, CourseType, CourseName) " +
+                    "VALUES((SELECT professors.ProfessorID FROM Professors WHERE Email = ?), ?, ?)";
+            PreparedStatement stmt = db.connection.prepareStatement(query);
+            stmt.setString(1, professorEmail);
+            stmt.setString(2, courseType);
+            stmt.setString(3, name);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new SQLException(e.getMessage());
+        }
+    }
 
 }

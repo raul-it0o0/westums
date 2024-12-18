@@ -1,12 +1,11 @@
 package com.westums.controllers;
 
-import com.westums.models.AccountManager;
+import com.westums.models.DatabaseManager;
 import com.westums.models.InputVerifier;
 import com.westums.views.AdminDashboard;
 
 import javax.swing.*;
 import javax.swing.event.*;
-import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -68,6 +67,15 @@ public class AdminDashboardController implements ActionListener, TreeSelectionLi
         // Add Course Card components:
         view.addCourseButton.addActionListener(this);
         view.addCourseButton.setActionCommand("Add Course");
+
+        view.courseNameField.getDocument().addDocumentListener(this);
+        view.courseProfessorEmailField.getDocument().addDocumentListener(this);
+
+        view.courseNameField.addMouseListener(this);
+        view.courseProfessorEmailField.addMouseListener(this);
+
+        view.courseTypeComboBox.addActionListener(this);
+        view.courseTypeComboBox.setActionCommand("Course type selected");
     }
 
     @Override
@@ -78,6 +86,10 @@ public class AdminDashboardController implements ActionListener, TreeSelectionLi
     }
 
     private void resetViewFields() {
+        // Set the card layout to the first card
+        view.optionTree.clearSelection();
+        view.showCard("Default Card");
+
         // Add Student Card fields:
         view.studentNameField.setText(null);
         view.studentSurnameField.setText(null);
@@ -103,7 +115,18 @@ public class AdminDashboardController implements ActionListener, TreeSelectionLi
         // Reset button
         view.setButtonState(view.addProfessorButton, AdminDashboard.ButtonState.ADD);
 
-        // TODO: Reset Add Course Card fields
+        // Add Course Card fields:
+        view.courseNameField.setText(null);
+        view.courseProfessorEmailField.setText(null);
+        view.courseTypeComboBox.setSelectedItem(null);
+        // Clear error labels
+        view.courseNameErrorLabel.setVisible(false);
+        view.courseProfessorEmailInvalidLabel.setVisible(false);
+        view.courseProfessorEmailNotFoundLabel.setVisible(false);
+        view.courseProfessorEmailFoundLabel.setVisible(false);
+        view.courseTypeErrorLabel.setVisible(false);
+        // Reset button
+        view.setButtonState(view.addCourseButton, AdminDashboard.ButtonState.ADD);
 
         view.revalidate();
         view.repaint();
@@ -124,8 +147,8 @@ public class AdminDashboardController implements ActionListener, TreeSelectionLi
 
             // Add student to the database
             try {
-                AccountManager.createAccount(email, AccountManager.UserType.STUDENT);
-                AccountManager.addStudent(email, name, surname, birthDate);
+                DatabaseManager.createAccount(email, DatabaseManager.AccountType.STUDENT);
+                DatabaseManager.addStudent(email, name, surname, birthDate);
             } catch (SQLException e) {
                 new JOptionPane(e.getMessage(), JOptionPane.ERROR_MESSAGE);
                 return;
@@ -152,8 +175,8 @@ public class AdminDashboardController implements ActionListener, TreeSelectionLi
 
             // Add professor to the database
             try {
-                AccountManager.createAccount(email, AccountManager.UserType.PROFESSOR);
-                AccountManager.addProfessor(email, name, surname, birthDate);
+                DatabaseManager.createAccount(email, DatabaseManager.AccountType.PROFESSOR);
+                DatabaseManager.addProfessor(email, name, surname, birthDate);
             } catch (SQLException e) {
                 new JOptionPane(e.getMessage(), JOptionPane.ERROR_MESSAGE);
                 return;
@@ -168,6 +191,116 @@ public class AdminDashboardController implements ActionListener, TreeSelectionLi
             view.revalidate();
             view.repaint();
         }
+        else if (event.getActionCommand().equals("Course type selected")) {
+            // Reset the button's state if already in success state
+            view.setButtonState(view.addCourseButton, AdminDashboard.ButtonState.ADD);
+            // Clear the error label
+            view.courseTypeErrorLabel.setVisible(false);
+
+            verifyAddCourseFields();
+        }
+        else if (event.getActionCommand().equals("Add Course")) {
+            // Get field data
+            String courseName = view.courseNameField.getText().trim();
+            String professorEmail = view.courseProfessorEmailField.getText().trim();
+            String courseType = (String)view.courseTypeComboBox.getSelectedItem();
+
+            // Add course to the database
+            try {
+                DatabaseManager.addCourse(courseName, professorEmail, courseType);
+            } catch (SQLException e) {
+                new JOptionPane(e.getMessage(), JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Change the look of the button to show success
+            view.setButtonState(view.addCourseButton, AdminDashboard.ButtonState.ADDED);
+            // Clear all fields
+            view.courseNameField.setText("");
+            view.courseProfessorEmailField.setText("");
+            view.revalidate();
+            view.repaint();
+        }
+    }
+
+    /**
+     * Check all the fields of the Add Course card for validity
+     */
+    private void verifyAddCourseFields() {
+        // Check if course name is valid, display error label is not
+        // Search for the professor email in the database, display appropriate label
+        // Enable or disable the add course button based on the validity of the fields
+
+        // Get field data and preprocess
+        String name = view.courseNameField.getText().trim();
+        String professorEmail = view.courseProfessorEmailField.getText().trim();
+        boolean courseTypeSelected = (view.courseTypeComboBox.getSelectedItem() != null);
+
+        boolean nameValid = InputVerifier.isValidCourseName(name);
+        boolean professorEmailValid = true;
+
+        if (!nameValid) {
+            // Display error label
+            view.courseNameErrorLabel.setVisible(true);
+            // Disable add course button
+            view.addCourseButton.setEnabled(false);
+
+            view.revalidate();
+            view.repaint();
+        }
+
+        if (professorEmail.isEmpty()) {
+            professorEmailValid = false;
+            // Display `Invalid email` error label
+            view.courseProfessorEmailInvalidLabel.setVisible(true);
+            // Disable add course button
+            view.addCourseButton.setEnabled(false);
+
+            view.revalidate();
+            view.repaint();
+        }
+
+        // NOTE: The professorEmailValid variable is part of the condition so as to prevent unnecessary
+        //  searching in the database if it was already set to
+        //  false due to the email field being empty
+        try {
+            if (professorEmailValid && !DatabaseManager.isValidProfessorEmail(professorEmail)) {
+                professorEmailValid = false;
+                // Display `Professor not found` error label
+                view.courseProfessorEmailNotFoundLabel.setVisible(true);
+                // Disable add course button
+                view.addCourseButton.setEnabled(false);
+
+                view.revalidate();
+                view.repaint();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        if (professorEmailValid) {
+            // Display `Found` label
+            view.courseProfessorEmailFoundLabel.setVisible(true);
+
+            view.revalidate();
+            view.repaint();
+        }
+
+        if (!courseTypeSelected) {
+            // Display `Please choose a course type!` label
+            view.courseTypeErrorLabel.setVisible(true);
+
+            view.revalidate();
+            view.repaint();
+        }
+
+        // To enable the add course button, all fields must be valid
+        if (!nameValid
+                || !professorEmailValid
+                || !courseTypeSelected) return;
+
+        // Enable add course button
+        view.addCourseButton.setEnabled(true);
     }
 
     @Override
@@ -188,6 +321,10 @@ public class AdminDashboardController implements ActionListener, TreeSelectionLi
                 view.showCard("Add Course Card");
                 return;
             }
+            default -> {
+                view.showCard("Default Card");
+                return;
+            }
         }
     }
 
@@ -198,6 +335,7 @@ public class AdminDashboardController implements ActionListener, TreeSelectionLi
      */
     private boolean isVisibleCard(String cardName) {
         String treeNodeName = cardName.replace(" Card", "");
+        if (view.optionTree.getLastSelectedPathComponent() == null) return false;
         return (view.optionTree.getLastSelectedPathComponent().toString().equals(treeNodeName));
     }
 
@@ -262,6 +400,31 @@ public class AdminDashboardController implements ActionListener, TreeSelectionLi
                 return;
             }
         }
+        else if (isVisibleCard("Add Course Card")) {
+            // Reset the button's state if already in success state
+            view.setButtonState(view.addCourseButton, AdminDashboard.ButtonState.ADD);
+
+            // If neither error label is visible, return
+            if (!view.courseNameErrorLabel.isVisible()
+                    && !view.courseProfessorEmailInvalidLabel.isVisible()
+                    && !view.courseProfessorEmailNotFoundLabel.isVisible()
+                    && !view.courseProfessorEmailFoundLabel.isVisible()
+                    && !view.courseTypeErrorLabel.isVisible()) return;
+
+            // Clear the label on the field where the mouse was clicked
+            if (event.getSource() == view.courseNameField) {
+                view.courseNameErrorLabel.setVisible(false);
+            }
+
+            else if (event.getSource() == view.courseProfessorEmailField) {
+                view.courseProfessorEmailInvalidLabel.setVisible(false);
+                view.courseProfessorEmailNotFoundLabel.setVisible(false);
+                view.courseProfessorEmailFoundLabel.setVisible(false);
+            }
+
+            view.revalidate();
+            view.repaint();
+        }
 
 
     }
@@ -281,6 +444,7 @@ public class AdminDashboardController implements ActionListener, TreeSelectionLi
 
         if (!nameValid) {
             // Display error label
+            System.out.println("Displaying error label on student name");
             view.studentNameErrorLabel.setVisible(true);
             // Clear generated email field
             view.generatedStudentEmailField.setText("");
@@ -308,7 +472,7 @@ public class AdminDashboardController implements ActionListener, TreeSelectionLi
 
         // Generate email and display it
         try {
-            view.generatedStudentEmailField.setText(AccountManager.generateStudentEmail(name,
+            view.generatedStudentEmailField.setText(DatabaseManager.generateStudentEmail(name,
                     surname, birthDate));
         } catch (SQLException e) {
             new JOptionPane(e.getMessage(), JOptionPane.ERROR_MESSAGE);
@@ -332,6 +496,7 @@ public class AdminDashboardController implements ActionListener, TreeSelectionLi
         boolean surnameValid = InputVerifier.isValidName(surname);
 
         if (!nameValid) {
+            System.out.println("Displaying error label on professor name");
             // Display error label
             view.professorNameErrorLabel.setVisible(true);
             // Clear generated email field
@@ -360,7 +525,7 @@ public class AdminDashboardController implements ActionListener, TreeSelectionLi
 
         // Generate email and display it
         try {
-            view.generatedProfessorEmailField.setText(AccountManager.generateProfessorEmail(name,
+            view.generatedProfessorEmailField.setText(DatabaseManager.generateProfessorEmail(name,
                     surname, birthDate));
         } catch (SQLException e) {
             new JOptionPane(e.getMessage(), JOptionPane.ERROR_MESSAGE);
@@ -380,7 +545,7 @@ public class AdminDashboardController implements ActionListener, TreeSelectionLi
             if (event.getDocument().equals(view.studentNameField.getDocument()))
                 view.studentNameErrorLabel.setVisible(false);
 
-            if (event.getDocument().equals(view.studentSurnameField.getDocument()))
+            else if (event.getDocument().equals(view.studentSurnameField.getDocument()))
                 view.studentSurnameErrorLabel.setVisible(false);
 
             view.revalidate();
@@ -394,7 +559,7 @@ public class AdminDashboardController implements ActionListener, TreeSelectionLi
             if (event.getDocument().equals(view.professorNameField.getDocument()))
                 view.professorNameErrorLabel.setVisible(false);
 
-            if (event.getDocument().equals(view.professorSurnameField.getDocument()))
+            else if (event.getDocument().equals(view.professorSurnameField.getDocument()))
                 view.professorSurnameErrorLabel.setVisible(false);
 
             view.revalidate();
@@ -402,6 +567,22 @@ public class AdminDashboardController implements ActionListener, TreeSelectionLi
 
             // Verify fields and display email upon validity
             verifyAndDisplayProfessorEmail();
+        }
+        else if (isVisibleCard("Add Course Card")) {
+            // Clear the label on the field the document change came from
+            if (event.getDocument().equals(view.courseNameField.getDocument()))
+                view.courseNameErrorLabel.setVisible(false);
+
+            else if (event.getDocument().equals(view.courseProfessorEmailField.getDocument())) {
+                view.courseProfessorEmailInvalidLabel.setVisible(false);
+                view.courseProfessorEmailNotFoundLabel.setVisible(false);
+                view.courseProfessorEmailFoundLabel.setVisible(false);
+            }
+
+            view.revalidate();
+            view.repaint();
+
+            verifyAddCourseFields();
         }
     }
 

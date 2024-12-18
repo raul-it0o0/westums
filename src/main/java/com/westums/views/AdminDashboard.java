@@ -128,10 +128,12 @@ public class AdminDashboard extends JPanel {
         courseProfessorEmailPanel = new JPanel();
         courseProfessorEmailLabel = new JLabel();
         courseProfessorEmailField = new JXFormattedTextField();
-        courseProfessorEmailErrorLabel = new JLabel();
+        courseProfessorEmailInvalidLabel = new JLabel();
+        courseProfessorEmailNotFoundLabel = new JLabel();
+        courseProfessorEmailFoundLabel = new JLabel();
         courseTypePanel = new JPanel();
         courseTypeLabel = new JLabel();
-        courseTypeComboBox = new JComboBox();
+        courseTypeComboBox = new JComboBox<String>();
         courseTypeErrorLabel = new JLabel();
         addCourseButtonPanel = new JPanel();
         addCourseButton = new JButton();
@@ -863,14 +865,16 @@ public class AdminDashboard extends JPanel {
                 {
                     courseProfessorEmailPanel.setOpaque(false);
                     courseProfessorEmailPanel.setLayout(new MigLayout(
-                            "insets 0,hidemode 3,gap 0 0",
-                            // columns
-                            "[grow,fill]",
-                            // rows
-                            "[grow,fill]" +
-                                    "[0,grow,fill]" +
-                                    "[grow,fill]" +
-                                    "[0]"));
+                        "insets 0,hidemode 3,gap 0 0",
+                        // columns
+                        "[grow,fill]",
+                        // rows
+                        "[grow,fill]" +
+                        "[0,grow,fill]" +
+                        "[grow,fill]" +
+                        "[0]" +
+                        "[]" +
+                        "[]"));
 
                     //---- courseProfessorEmailLabel ----
                     courseProfessorEmailLabel.setText("Professor Email");
@@ -893,16 +897,40 @@ public class AdminDashboard extends JPanel {
                     courseProfessorEmailPanel.add(courseProfessorEmailField, "cell 0 2,grow");
 
                     //---- courseProfessorEmailErrorLabel ----
-                    courseProfessorEmailErrorLabel.setText("Invalid email");
-                    courseProfessorEmailErrorLabel.setFont(new Font("Inter 18pt",
-                            courseProfessorEmailErrorLabel.getFont().getStyle(), courseProfessorEmailErrorLabel.getFont().getSize() + 1));
-                    courseProfessorEmailErrorLabel.setForeground(new Color(0xec221f));
-                    courseProfessorEmailErrorLabel.setBorder(null);
-                    courseProfessorEmailErrorLabel.setMaximumSize(new Dimension(70, 15));
-                    courseProfessorEmailErrorLabel.setMinimumSize(new Dimension(70, 15));
-                    courseProfessorEmailErrorLabel.setPreferredSize(new Dimension(70, 15));
-                    courseProfessorEmailErrorLabel.setVisible(false);
-                    courseProfessorEmailPanel.add(courseProfessorEmailErrorLabel, "cell 0 3,grow,width 272:272:272");
+                    courseProfessorEmailInvalidLabel.setText("Invalid email");
+                    courseProfessorEmailInvalidLabel.setFont(new Font("Inter 18pt",
+                            courseProfessorEmailInvalidLabel.getFont().getStyle(), courseProfessorEmailInvalidLabel.getFont().getSize() + 1));
+                    courseProfessorEmailInvalidLabel.setForeground(new Color(0xec221f));
+                    courseProfessorEmailInvalidLabel.setBorder(null);
+                    courseProfessorEmailInvalidLabel.setMaximumSize(new Dimension(70, 15));
+                    courseProfessorEmailInvalidLabel.setMinimumSize(new Dimension(70, 15));
+                    courseProfessorEmailInvalidLabel.setPreferredSize(new Dimension(70, 15));
+                    courseProfessorEmailInvalidLabel.setVisible(false);
+                    courseProfessorEmailPanel.add(courseProfessorEmailInvalidLabel, "cell 0 3,grow,width 272:272:272");
+
+                    //---- courseProfessorEmailNotFoundLabel ----
+                    courseProfessorEmailNotFoundLabel.setText("Professor not found");
+                    courseProfessorEmailNotFoundLabel.setFont(new Font("Inter 18pt",
+                            courseProfessorEmailNotFoundLabel.getFont().getStyle(), courseProfessorEmailNotFoundLabel.getFont().getSize() + 1));
+                    courseProfessorEmailNotFoundLabel.setForeground(new Color(0xec221f));
+                    courseProfessorEmailNotFoundLabel.setBorder(null);
+                    courseProfessorEmailNotFoundLabel.setMaximumSize(new Dimension(70, 15));
+                    courseProfessorEmailNotFoundLabel.setMinimumSize(new Dimension(70, 15));
+                    courseProfessorEmailNotFoundLabel.setPreferredSize(new Dimension(70, 15));
+                    courseProfessorEmailNotFoundLabel.setVisible(false);
+                    courseProfessorEmailPanel.add(courseProfessorEmailNotFoundLabel, "cell 0 4,grow,width 272:272:272");
+
+                    //---- courseProfessorEmailFoundLabel ----
+                    courseProfessorEmailFoundLabel.setText("Found");
+                    courseProfessorEmailFoundLabel.setFont(new Font("Inter 18pt",
+                            courseProfessorEmailFoundLabel.getFont().getStyle(), courseProfessorEmailFoundLabel.getFont().getSize() + 1));
+                    courseProfessorEmailFoundLabel.setForeground(new Color(0x14ae5c));
+                    courseProfessorEmailFoundLabel.setBorder(null);
+                    courseProfessorEmailFoundLabel.setMaximumSize(new Dimension(70, 15));
+                    courseProfessorEmailFoundLabel.setMinimumSize(new Dimension(70, 15));
+                    courseProfessorEmailFoundLabel.setPreferredSize(new Dimension(70, 15));
+                    courseProfessorEmailFoundLabel.setVisible(false);
+                    courseProfessorEmailPanel.add(courseProfessorEmailFoundLabel, "cell 0 5,grow,width 272:272:272");
                 }
                 addCourseCard.add(courseProfessorEmailPanel, "cell 0 1");
 
@@ -929,6 +957,11 @@ public class AdminDashboard extends JPanel {
                     courseTypePanel.add(courseTypeLabel, "cell 0 0,growx,gapy null 3");
 
                     //---- courseTypeComboBox ----
+                    courseTypeComboBox.setModel(new DefaultComboBoxModel<>(new String[] {
+                            "Lecture",
+                            "Seminar",
+                            "Laboratory"
+                    }));
                     courseTypeComboBox.setBorder(new LineBorder(new Color(0x757575)));
                     courseTypeComboBox.setForeground(new Color(0x1e1e1e));
                     courseTypeComboBox.setBackground(new Color(0xf5f5f5));
@@ -936,6 +969,7 @@ public class AdminDashboard extends JPanel {
                     courseTypeComboBox.setMinimumSize(new Dimension(320, 40));
                     courseTypeComboBox.setMaximumSize(new Dimension(320, 40));
                     courseTypeComboBox.setPreferredSize(new Dimension(320, 40));
+                    courseTypeComboBox.setSelectedItem(null);
                     courseTypePanel.add(courseTypeComboBox, "pad 0,cell 0 2,grow");
 
                     //---- courseTypeErrorLabel ----
@@ -947,6 +981,7 @@ public class AdminDashboard extends JPanel {
                     courseTypeErrorLabel.setMaximumSize(new Dimension(70, 15));
                     courseTypeErrorLabel.setMinimumSize(new Dimension(70, 15));
                     courseTypeErrorLabel.setPreferredSize(new Dimension(70, 15));
+                    courseTypeErrorLabel.setVisible(false);
                     courseTypePanel.add(courseTypeErrorLabel, "cell 0 3,grow,width 272:272:272");
                 }
                 addCourseCard.add(courseTypePanel, "cell 0 2");
@@ -962,6 +997,7 @@ public class AdminDashboard extends JPanel {
                     addCourseButton.setBorder(new LineBorder(new Color(0x757575)));
                     addCourseButton.setForeground(new Color(0xf5f5f5));
                     addCourseButton.setBackground(new Color(0x2c2c2c));
+                    addCourseButton.setEnabled(false);
                     addCourseButtonPanel.add(addCourseButton, BorderLayout.CENTER);
                 }
                 addCourseCard.add(addCourseButtonPanel, "cell 0 4,gapy null 20");
@@ -1034,11 +1070,13 @@ public class AdminDashboard extends JPanel {
     private JPanel courseProfessorEmailPanel;
     private JLabel courseProfessorEmailLabel;
     public JXFormattedTextField courseProfessorEmailField;
-    private JLabel courseProfessorEmailErrorLabel;
+    public JLabel courseProfessorEmailInvalidLabel;
+    public JLabel courseProfessorEmailNotFoundLabel;
+    public JLabel courseProfessorEmailFoundLabel;
     private JPanel courseTypePanel;
     private JLabel courseTypeLabel;
-    private JComboBox courseTypeComboBox;
-    private JLabel courseTypeErrorLabel;
+    public JComboBox<String> courseTypeComboBox;
+    public JLabel courseTypeErrorLabel;
     private JPanel addCourseButtonPanel;
     public JButton addCourseButton;
     // JFormDesigner - End of variables declaration  //GEN-END:variables  @formatter:on
