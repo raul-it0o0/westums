@@ -25,8 +25,7 @@ public class MainController {
             DatabaseConnection db = new DatabaseConnection();
         }
         catch (Exception e) {
-            new JOptionPane(e.getMessage(), JOptionPane.ERROR_MESSAGE);
-            System.exit(0);
+            JOptionPane.showMessageDialog(this.view, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
 
         // Initialize all other card panel controllers,

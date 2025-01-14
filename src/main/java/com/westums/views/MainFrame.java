@@ -9,33 +9,13 @@ import com.toedter.calendar.JCalendar;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.io.InputStream;
 import java.util.Arrays;
 
 public class MainFrame extends JFrame {
 
     public MainFrame() {
-        initUISettings();
         initComponents();
-    }
-
-    private void initUISettings() {
-        try {
-            UIManager.setLookAndFeel("com.formdev.flatlaf.intellijthemes.FlatDarkFlatIJTheme");
-
-            Font Inter_18pt_Regular = Font.createFont(Font.TRUETYPE_FONT,
-                    new File("src/main/resources/fonts/Inter_18pt-Regular.ttf")).deriveFont(12f);
-            UIManager.getLookAndFeelDefaults().put("defaultFont", Inter_18pt_Regular);
-            GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(Inter_18pt_Regular);
-
-            Font Inter_18pt_Bold = Font.createFont(Font.TRUETYPE_FONT,
-                    new File("src/main/resources/fonts/Inter_18pt-Bold.ttf")).deriveFont(12f);
-            GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(Inter_18pt_Bold);
-
-        }
-        catch (Exception e) {
-            System.out.println(e.getMessage());
-            System.exit(0);
-        }
     }
 
     public void showCard(String cardName) {

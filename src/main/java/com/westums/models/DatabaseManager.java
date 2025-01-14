@@ -6,8 +6,11 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.mindrot.jbcrypt.BCrypt;
+
+import javax.swing.*;
 
 public class DatabaseManager {
 
@@ -34,6 +37,57 @@ public class DatabaseManager {
         catch (SQLException e) {
             throw new SQLException(e.getMessage());
         }
+    }
+
+    public static int getStudentID(String studentEmail) throws SQLException {
+        int studentID = 0;
+
+        try {
+            DatabaseConnection db = new DatabaseConnection();
+
+            String query = "SELECT StudentID " +
+                    "FROM Students " +
+                    "WHERE Email = ?";
+            PreparedStatement stmt = db.connection.prepareStatement(query);
+            stmt.setString(1, studentEmail);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next())
+                studentID = rs.getInt("StudentID");
+            return studentID;
+        }
+        catch (SQLException e) {
+            throw new SQLException(e.getMessage());
+        }
+    }
+
+    public static ArrayList<Course> fetchStudentEnrollments(int studentID) throws SQLException {
+        ArrayList<Course> courses = new ArrayList<>();
+
+        try {
+            DatabaseConnection db = new DatabaseConnection();
+
+            String query = "SELECT courses.CourseID, CourseName, CourseType " +
+                    "FROM Enrollments " +
+                    "JOIN Courses ON Enrollments.CourseID = Courses.CourseID " +
+                    "WHERE StudentID = ?";
+            PreparedStatement stmt = db.connection.prepareStatement(query);
+            stmt.setInt(1, studentID);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                courses.add(new Course(
+                        rs.getInt("CourseID"),
+                        rs.getString("CourseName"),
+                        rs.getString("CourseType")
+                ));
+            }
+        }
+        catch (SQLException e) {
+            throw new SQLException(e.getMessage());
+        }
+
+        return courses;
     }
 
     public enum AccountType {
@@ -425,6 +479,77 @@ public class DatabaseManager {
             stmt.setString(3, name);
             stmt.executeUpdate();
         } catch (SQLException e) {
+            throw new SQLException(e.getMessage());
+        }
+    }
+
+    public static ArrayList<Course> fetchAvailableCourses() throws SQLException {
+        try {
+            DatabaseConnection db = new DatabaseConnection();
+
+            String query = "SELECT CourseID, CourseName, CourseType " +
+                    "FROM courses";
+            PreparedStatement stmt = db.connection.prepareStatement(query);
+            ResultSet rs = stmt.executeQuery();
+
+            ArrayList<Course> courses = new ArrayList<>();
+            while (rs.next()) {
+                courses.add(new Course(
+                        rs.getInt("CourseID"),
+                        rs.getString("CourseName"),
+                        rs.getString("CourseType")
+                ));
+            }
+
+            return courses;
+        }
+        catch (SQLException e) {
+            throw new SQLException(e.getMessage());
+        }
+    }
+
+    public static void updateEnrollments(int studentID, List<Course> selectedCourses) throws SQLException {
+        // Get initial courses (i.e. the courses that the student was originally enrolled in)
+        ArrayList<Course> initialCourses = DatabaseManager.fetchStudentEnrollments(studentID);
+
+        // Determine the courses that were added (i.e. new enrollments)
+        ArrayList<Course> addedCourses = new ArrayList<>(selectedCourses);
+        addedCourses.removeAll(initialCourses);
+
+        // Determine the courses that were removed (i.e. enrollment records that need to be removed)
+        ArrayList<Course> removedCourses = new ArrayList<>(initialCourses);
+        removedCourses.removeAll(selectedCourses);
+
+        try {
+            DatabaseConnection db = new DatabaseConnection();
+
+            // Insert new enrollments (batch insert)
+            if (!addedCourses.isEmpty()) {
+                String insertionQuery = "INSERT INTO Enrollments(StudentID, CourseID) " +
+                        "VALUES(?, ?)";
+                PreparedStatement stmt = db.connection.prepareStatement(insertionQuery);
+                stmt.setInt(1, studentID);
+                for (Course course : addedCourses) {
+                    stmt.setInt(2, course.getID());
+                    stmt.addBatch();
+                }
+                stmt.executeBatch();
+            }
+
+            if (!removedCourses.isEmpty()) {
+                // Delete removed enrollments (batch delete)
+                String deletionQuery = "DELETE FROM Enrollments " +
+                        "WHERE StudentID = ? AND CourseID = ?";
+                PreparedStatement stmt = db.connection.prepareStatement(deletionQuery);
+                stmt.setInt(1, studentID);
+                for (Course course : removedCourses) {
+                    stmt.setInt(2, course.getID());
+                    stmt.addBatch();
+                }
+                stmt.executeBatch();
+            }
+        }
+        catch (SQLException e) {
             throw new SQLException(e.getMessage());
         }
     }

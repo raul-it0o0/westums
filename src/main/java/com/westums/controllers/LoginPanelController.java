@@ -125,8 +125,8 @@ public class LoginPanelController implements ActionListener, CaretListener, Comp
                         accountType = DatabaseManager.AccountType.valueOf(String.valueOf(list.get(1)));
                     }
                 }
-                catch (java.sql.SQLException SQLException) {
-                    new JOptionPane(SQLException.getMessage(), JOptionPane.ERROR_MESSAGE);
+                catch (java.sql.SQLException e) {
+                    JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
@@ -182,8 +182,8 @@ public class LoginPanelController implements ActionListener, CaretListener, Comp
                     DatabaseManager.insertPassword(enteredEmail, enteredPassword);
                     redirectView(accountType);
                 }
-                catch (java.sql.SQLException SQLException) {
-                    new JOptionPane(SQLException.getMessage(), JOptionPane.ERROR_MESSAGE);
+                catch (java.sql.SQLException e) {
+                    JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
             }

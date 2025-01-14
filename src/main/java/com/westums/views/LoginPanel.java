@@ -181,7 +181,7 @@ public class LoginPanel extends JPanel {
 
                     //---- button1 ----
                     signInButton.setText("Sign In");
-
+                    signInButton.setBorder(null);
                     signInButton.setFont(new Font("Inter 18pt", Font.PLAIN, 15));
                     buttonPanel.add(signInButton, BorderLayout.CENTER);
                 }

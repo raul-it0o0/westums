@@ -1,8 +1,10 @@
 package com.westums.controllers;
 
-import com.westums.models.DatabaseManager;
+import com.westums.models.*;
 import com.westums.models.InputVerifier;
 import com.westums.views.AdminDashboard;
+import com.westums.views.ViewStudentsDialog;
+import com.westums.views.designs.ViewStudentsDialogDesign;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -10,23 +12,29 @@ import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.sql.SQLException;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class AdminDashboardController implements ActionListener, TreeSelectionListener, MouseListener,
-        PropertyChangeListener, DocumentListener, ComponentListener  {
+        PropertyChangeListener, DocumentListener, ComponentListener, ListSelectionListener  {
 
     AdminDashboard view;
+    ViewStudentsDialogController viewStudentsDialogController;
     Consumer<String> showCardMethod;
-
+    private DefaultListSelectionModel selectableListSelectionModel;
+    private DefaultListSelectionModel nonSelectableListSelectionModel;
 
     AdminDashboardController(AdminDashboard adminDashboardInstance, Consumer<String> switchCard) {
         this.view = adminDashboardInstance;
         this.showCardMethod = switchCard;
+        this.selectableListSelectionModel = (DefaultListSelectionModel) view.courseList.getSelectionModel();
+        this.nonSelectableListSelectionModel = new NonSelectableListSelectionModel();
 
         view.optionTree.addTreeSelectionListener(this);
         view.logoutPanel.addMouseListener(this);
+
+        // Make course list non-selectable
+        view.courseList.setSelectionModel(nonSelectableListSelectionModel);
 
         registerAsListener();
     }
@@ -76,6 +84,16 @@ public class AdminDashboardController implements ActionListener, TreeSelectionLi
 
         view.courseTypeComboBox.addActionListener(this);
         view.courseTypeComboBox.setActionCommand("Course type selected");
+
+        // Add Enrollment Card components:
+        view.studentEnrollmentEmailField.addMouseListener(this);
+        view.studentEnrollmentEmailField.getDocument().addDocumentListener(this);
+
+        view.refreshCourseListButton.addActionListener(this);
+        view.refreshCourseListButton.setActionCommand("Refresh course list");
+
+        view.addEnrollmentButton.addActionListener(this);
+        view.addEnrollmentButton.setActionCommand("Add Enrollment");
     }
 
     @Override
@@ -101,7 +119,7 @@ public class AdminDashboardController implements ActionListener, TreeSelectionLi
         view.studentNameErrorLabel.setVisible(false);
         view.studentSurnameErrorLabel.setVisible(false);
         // Reset button
-        view.setButtonState(view.addStudentButton, AdminDashboard.ButtonState.ADD);
+        view.setButtonState(view.addStudentButton, AdminDashboard.ButtonState.NEUTRAL);
 
         // Add Professor Card fields:
         view.professorNameField.setText(null);
@@ -113,7 +131,7 @@ public class AdminDashboardController implements ActionListener, TreeSelectionLi
         view.professorNameErrorLabel.setVisible(false);
         view.professorSurnameErrorLabel.setVisible(false);
         // Reset button
-        view.setButtonState(view.addProfessorButton, AdminDashboard.ButtonState.ADD);
+        view.setButtonState(view.addProfessorButton, AdminDashboard.ButtonState.NEUTRAL);
 
         // Add Course Card fields:
         view.courseNameField.setText(null);
@@ -126,10 +144,36 @@ public class AdminDashboardController implements ActionListener, TreeSelectionLi
         view.courseProfessorEmailFoundLabel.setVisible(false);
         view.courseTypeErrorLabel.setVisible(false);
         // Reset button
-        view.setButtonState(view.addCourseButton, AdminDashboard.ButtonState.ADD);
+        view.setButtonState(view.addCourseButton, AdminDashboard.ButtonState.NEUTRAL);
+
+        // Add Enrollment Card fields:
+        view.studentEnrollmentEmailField.setText(null);
+        view.courseList.clearSelection();
+        // Clear labels
+        view.studentEnrollmentEmailInvalidLabel.setVisible(false);
+        view.studentEnrollmentEmailNotFoundLabel.setVisible(false);
+        view.studentEnrollmentEmailFoundLabel.setVisible(false);
+        // Reset button
+        view.setButtonState(view.addEnrollmentButton, AdminDashboard.ButtonState.NEUTRAL);
 
         view.revalidate();
         view.repaint();
+    }
+
+    private void fetchAndDisplayCourses() {
+
+        ArrayList<Course> availableCourses;
+        try {
+            availableCourses = DatabaseManager.fetchAvailableCourses();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        for (Course course : availableCourses) {
+            if (!view.courseListModel.contains(course))
+                view.courseListModel.addElement(course);
+        }
     }
 
     @Override
@@ -150,12 +194,12 @@ public class AdminDashboardController implements ActionListener, TreeSelectionLi
                 DatabaseManager.createAccount(email, DatabaseManager.AccountType.STUDENT);
                 DatabaseManager.addStudent(email, name, surname, birthDate);
             } catch (SQLException e) {
-                new JOptionPane(e.getMessage(), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
             // Change the look of the button to show success
-            view.setButtonState(view.addStudentButton, AdminDashboard.ButtonState.ADDED);
+            view.setButtonState(view.addStudentButton, AdminDashboard.ButtonState.SUCCESS);
             // Clear all fields
             view.studentNameField.setText("");
             view.studentSurnameField.setText("");
@@ -178,12 +222,12 @@ public class AdminDashboardController implements ActionListener, TreeSelectionLi
                 DatabaseManager.createAccount(email, DatabaseManager.AccountType.PROFESSOR);
                 DatabaseManager.addProfessor(email, name, surname, birthDate);
             } catch (SQLException e) {
-                new JOptionPane(e.getMessage(), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
             // Change the look of the button to show success
-            view.setButtonState(view.addProfessorButton, AdminDashboard.ButtonState.ADDED);
+            view.setButtonState(view.addProfessorButton, AdminDashboard.ButtonState.SUCCESS);
             // Clear all fields
             view.professorNameField.setText("");
             view.professorSurnameField.setText("");
@@ -193,7 +237,7 @@ public class AdminDashboardController implements ActionListener, TreeSelectionLi
         }
         else if (event.getActionCommand().equals("Course type selected")) {
             // Reset the button's state if already in success state
-            view.setButtonState(view.addCourseButton, AdminDashboard.ButtonState.ADD);
+            view.setButtonState(view.addCourseButton, AdminDashboard.ButtonState.NEUTRAL);
             // Clear the error label
             view.courseTypeErrorLabel.setVisible(false);
 
@@ -209,15 +253,37 @@ public class AdminDashboardController implements ActionListener, TreeSelectionLi
             try {
                 DatabaseManager.addCourse(courseName, professorEmail, courseType);
             } catch (SQLException e) {
-                new JOptionPane(e.getMessage(), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
             // Change the look of the button to show success
-            view.setButtonState(view.addCourseButton, AdminDashboard.ButtonState.ADDED);
+            view.setButtonState(view.addCourseButton, AdminDashboard.ButtonState.SUCCESS);
             // Clear all fields
             view.courseNameField.setText("");
             view.courseProfessorEmailField.setText("");
+            view.revalidate();
+            view.repaint();
+        }
+        else if (event.getActionCommand().equals("Refresh course list")) {
+            // Fetch and display courses
+            fetchAndDisplayCourses();
+        }
+        else if (event.getActionCommand().equals("Add Enrollment")) {
+            String studentEmail = view.studentEnrollmentEmailField.getText().trim();
+            try {
+                DatabaseManager.updateEnrollments(DatabaseManager.getStudentID(studentEmail),
+                        view.courseList.getSelectedValuesList());
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Change the look of the button to show success
+            view.setButtonState(view.addEnrollmentButton, AdminDashboard.ButtonState.SUCCESS);
+            // Clear all fields
+            view.studentEnrollmentEmailField.setText("");
+            view.courseList.clearSelection();
             view.revalidate();
             view.repaint();
         }
@@ -275,7 +341,8 @@ public class AdminDashboardController implements ActionListener, TreeSelectionLi
                 view.repaint();
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            return;
         }
 
         if (professorEmailValid) {
@@ -321,6 +388,16 @@ public class AdminDashboardController implements ActionListener, TreeSelectionLi
                 view.showCard("Add Course Card");
                 return;
             }
+            case "Add Enrollment" -> {
+                view.showCard("Add Enrollment Card");
+                fetchAndDisplayCourses();
+                return;
+            }
+            case "View Students" -> {
+                 this.viewStudentsDialogController =
+                         new ViewStudentsDialogController(
+                                 new ViewStudentsDialog(SwingUtilities.getWindowAncestor(view)));
+            }
             default -> {
                 view.showCard("Default Card");
                 return;
@@ -349,7 +426,7 @@ public class AdminDashboardController implements ActionListener, TreeSelectionLi
         // Different actions based on which card is currently visible
         if (isVisibleCard("Add Student Card")) {
             // Reset the button's state if already in success state
-            view.setButtonState(view.addStudentButton, AdminDashboard.ButtonState.ADD);
+            view.setButtonState(view.addStudentButton, AdminDashboard.ButtonState.NEUTRAL);
 
             // If neither error label is visible, return
             if (!view.studentNameErrorLabel.isVisible()
@@ -376,7 +453,7 @@ public class AdminDashboardController implements ActionListener, TreeSelectionLi
         }
         else if (isVisibleCard("Add Professor Card")) {
             // Reset the button's state if already in success state
-            view.setButtonState(view.addProfessorButton, AdminDashboard.ButtonState.ADD);
+            view.setButtonState(view.addProfessorButton, AdminDashboard.ButtonState.NEUTRAL);
             // If neither error label is visible, return
             if (!view.professorNameErrorLabel.isVisible()
                     && !view.professorSurnameErrorLabel.isVisible()) return;
@@ -402,7 +479,7 @@ public class AdminDashboardController implements ActionListener, TreeSelectionLi
         }
         else if (isVisibleCard("Add Course Card")) {
             // Reset the button's state if already in success state
-            view.setButtonState(view.addCourseButton, AdminDashboard.ButtonState.ADD);
+            view.setButtonState(view.addCourseButton, AdminDashboard.ButtonState.NEUTRAL);
 
             // If neither error label is visible, return
             if (!view.courseNameErrorLabel.isVisible()
@@ -420,6 +497,23 @@ public class AdminDashboardController implements ActionListener, TreeSelectionLi
                 view.courseProfessorEmailInvalidLabel.setVisible(false);
                 view.courseProfessorEmailNotFoundLabel.setVisible(false);
                 view.courseProfessorEmailFoundLabel.setVisible(false);
+            }
+
+            view.revalidate();
+            view.repaint();
+        }
+        else if (isVisibleCard("Add Enrollment Card")) {
+            // Reset the button's state if already in success state
+            view.setButtonState(view.addEnrollmentButton, AdminDashboard.ButtonState.NEUTRAL);
+
+            // If neither error label is visible, return
+            if (!view.studentEnrollmentEmailNotFoundLabel.isVisible()
+                    && !view.studentEnrollmentEmailFoundLabel.isVisible()) return;
+
+            // Clear the label on the field where the mouse was clicked
+            if (event.getSource() == view.studentEnrollmentEmailField) {
+                view.studentEnrollmentEmailNotFoundLabel.setVisible(false);
+                view.studentEnrollmentEmailFoundLabel.setVisible(false);
             }
 
             view.revalidate();
@@ -444,7 +538,6 @@ public class AdminDashboardController implements ActionListener, TreeSelectionLi
 
         if (!nameValid) {
             // Display error label
-            System.out.println("Displaying error label on student name");
             view.studentNameErrorLabel.setVisible(true);
             // Clear generated email field
             view.generatedStudentEmailField.setText("");
@@ -475,7 +568,7 @@ public class AdminDashboardController implements ActionListener, TreeSelectionLi
             view.generatedStudentEmailField.setText(DatabaseManager.generateStudentEmail(name,
                     surname, birthDate));
         } catch (SQLException e) {
-            new JOptionPane(e.getMessage(), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
         // Enable add student button
@@ -496,7 +589,6 @@ public class AdminDashboardController implements ActionListener, TreeSelectionLi
         boolean surnameValid = InputVerifier.isValidName(surname);
 
         if (!nameValid) {
-            System.out.println("Displaying error label on professor name");
             // Display error label
             view.professorNameErrorLabel.setVisible(true);
             // Clear generated email field
@@ -528,7 +620,7 @@ public class AdminDashboardController implements ActionListener, TreeSelectionLi
             view.generatedProfessorEmailField.setText(DatabaseManager.generateProfessorEmail(name,
                     surname, birthDate));
         } catch (SQLException e) {
-            new JOptionPane(e.getMessage(), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
         // Enable add professor button
@@ -584,6 +676,97 @@ public class AdminDashboardController implements ActionListener, TreeSelectionLi
 
             verifyAddCourseFields();
         }
+        else if (isVisibleCard("Add Enrollment Card")) {
+            // Stop listening for changes in the list selection
+            view.courseList.removeListSelectionListener(this);
+
+            // Clear the label on the field the document change came from
+            if (event.getDocument().equals(view.studentEnrollmentEmailField.getDocument())) {
+                view.studentEnrollmentEmailNotFoundLabel.setVisible(false);
+                view.studentEnrollmentEmailFoundLabel.setVisible(false);
+            }
+
+            view.revalidate();
+            view.repaint();
+
+            checkStudentEnrollmentEmailField();
+        }
+    }
+
+    private void checkStudentEnrollmentEmailField() {
+        String studentEmail = view.studentEnrollmentEmailField.getText().trim();
+        int studentID = 0;
+
+        if (studentEmail.isEmpty()) {
+            // Display `Invalid email` label
+            view.studentEnrollmentEmailInvalidLabel.setVisible(true);
+            // Unselect any selected courses
+            view.courseList.clearSelection();
+            // Disable selection
+            view.courseList.setSelectionModel(nonSelectableListSelectionModel);
+            // Disable add enrollment button
+            view.addEnrollmentButton.setEnabled(false);
+
+            view.revalidate();
+            view.repaint();
+            return;
+        }
+
+        try {
+            studentID = DatabaseManager.getStudentID(studentEmail);
+        }
+        catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        if (studentID == 0) {
+            // Display `Student not found` label
+            view.studentEnrollmentEmailNotFoundLabel.setVisible(true);
+            // Unselect any selected courses
+            view.courseList.clearSelection();
+            // Disable selection
+            view.courseList.setSelectionModel(nonSelectableListSelectionModel);
+            // Disable add enrollment button
+            view.addEnrollmentButton.setEnabled(false);
+
+            view.revalidate();
+            view.repaint();
+        }
+        else {
+            // Student found
+            // Display `Student found` label
+            view.studentEnrollmentEmailFoundLabel.setVisible(true);
+            updateCourseSelection(studentID);
+            // Enable selection
+            view.courseList.setSelectionModel(selectableListSelectionModel);
+        }
+    }
+
+    private void updateCourseSelection(int studentID) {
+        // Update available courses (and display them)
+        fetchAndDisplayCourses();
+        view.courseList.clearSelection();
+        // Make list selectable
+        view.courseList.setSelectionModel(selectableListSelectionModel);
+        view.courseList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+
+        // Get the courses the student is enrolled in
+        ArrayList<Course> studentEnrollments;
+        try {
+            studentEnrollments = DatabaseManager.fetchStudentEnrollments(studentID);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        for (Course course : studentEnrollments) {
+            view.courseList.addSelectionInterval(view.courseListModel.indexOf(course),
+                    view.courseListModel.indexOf(course));
+        }
+
+        // Listen for any selection changes beyond this point (after pre-selecting)
+        view.courseList.addListSelectionListener(this);
     }
 
     // Redirect to the same method as insertUpdate
@@ -623,4 +806,12 @@ public class AdminDashboardController implements ActionListener, TreeSelectionLi
 
     @Override
     public void componentShown(ComponentEvent e) {return;}
+
+    @Override
+    public void valueChanged(ListSelectionEvent event) {
+        // When any value in the list is selected or deselected
+        // Enable add enrollment button, if not enabled already
+        if (!view.addEnrollmentButton.isEnabled())
+            view.addEnrollmentButton.setEnabled(true);
+    }
 }

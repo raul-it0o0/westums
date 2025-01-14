@@ -8,6 +8,8 @@ public class DatabaseConnection {
     public Connection connection;
     public Statement statement;
 
+    private static final String DBMS = "MySQL";
+
     public DatabaseConnection() throws SQLException {
 
         // Check if MySQL JDBC driver is installed on the system
@@ -25,7 +27,11 @@ public class DatabaseConnection {
             statement.execute("USE west_ums");
         }
         catch (SQLException e) {
-            throw new SQLException("Error connecting to database");
+            throw new SQLException(
+                String.format("Error connecting to database. The %s service may not be running.\n" +
+                                "Detailed error: %s",
+                        DBMS,
+                        e.getMessage()));
         }
     }
 }
