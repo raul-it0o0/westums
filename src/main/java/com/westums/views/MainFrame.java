@@ -15,10 +15,11 @@ public class MainFrame extends JFrame {
 
     /**
      * Switches the view in the card layout to the one with the given name.
-     * @param viewName The name of the view to switch to (e.g. "Admin Dashboard").
      */
     public void showView(String viewName) {
         cardLayout.show(mainPanel, viewName);
+        revalidate();
+        repaint();
     }
 
     /**
@@ -27,29 +28,11 @@ public class MainFrame extends JFrame {
      * @param viewName The name of the view to add to the card layout (e.g. "Admin Dashboard").
      * @return The view object that was added to the card layout.
      */
-    public Object addView(String viewName) {
-        if (viewName.equals("Login Panel")) {
-            // Instantiate view
-            LoginPanel loginPanel = new LoginPanel();
+    public Object addView(String viewName) throws Exception {
 
-            // Add view to card layout so it can be switched to
-            mainPanel.add(loginPanel, "Login Panel");
-
-            // Return the view so the controller can instantiate its controller
-            return loginPanel;
-        }
-        else if (viewName.equals("Admin Dashboard")) {
-            // Instantiate view
-            AdminDashboard adminDashboard = new AdminDashboard();
-
-            // Add view to card layout so it can be switched to
-            mainPanel.add(adminDashboard, "Admin Dashboard");
-
-            // Return the view so the controller can instantiate its controller
-            return adminDashboard;
-        }
-
-        return null;
+        Object view = View.getViewClass(viewName).getConstructor().newInstance();
+        mainPanel.add((Component) view, viewName);
+        return view;
     }
 
     /**
@@ -57,7 +40,7 @@ public class MainFrame extends JFrame {
      * Visually, this will remove the view from the screen
      * and only leave the frame visible (with no content).
      */
-    public void removeView() {
+    public void removeCurrentView() {
         // Only one view will be in the card layout at a time
         // Therefore the index of the card to remove is always 0
         mainPanel.remove(0);

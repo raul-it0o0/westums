@@ -1,9 +1,7 @@
-package com.westums.controllers;
+package com.westums.controllers.admindashboard;
 
 import com.westums.models.Student;
-import com.westums.views.ViewStudentsDialog;
-
-import javax.swing.*;
+import com.westums.views.admindashboard.ViewStudentsDialog;
 
 public class ViewStudentsDialogController {
 
@@ -15,8 +13,6 @@ public class ViewStudentsDialogController {
     }
 
     private void loadData() {
-        Student s = Student.builder("a","b","c")
-                .build();
 
     }
 

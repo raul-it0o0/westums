@@ -7,14 +7,14 @@ import com.westums.views.MainFrame;
 import com.westums.views.View;
 
 import javax.swing.*;
+import java.awt.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 
 public class MainController {
 
     private static MainFrame view;
-    private static String currentViewName = null;
     private static Object currentView = null;
-    private static String currentControllerName = null;
     private static Object currentController = null;
 
     public static void initialize() {
@@ -35,43 +35,36 @@ public class MainController {
     public static void show(String viewName) {
 
         // Remove the current view from the card layout
-        if (currentViewName != null) {
-            view.removeView();
+        if (currentView != null) {
+            view.removeCurrentView();
             currentView = null;
-            System.out.println("Removing current view: " + currentViewName);
         }
 
         // Remove the current controller
-        if (currentControllerName != null) {
+        if (currentController != null) {
             currentController = null;
-            System.out.println("Removing current controller: " + currentControllerName);
         }
 
         // Instantiate the view from MainFrame
-        currentView = view.addView(viewName);
+        // Exception when the viewName does not match
+        // to a view class
+        try {
+            currentView = view.addView(viewName);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(view, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
 
         // Instantiate the view's controller
-        // and show the card with the given name
-        // TODO: A dictionary of view names and their controllers
-        if (viewName.equals("Login Panel")) {
-            currentController = new LoginPanelController((LoginPanel) currentView);
+        // make the view visible
+        try {
+            currentController = View.getController(viewName)
+                    .getConstructor(Container.class)
+                    .newInstance(((Container) currentView));
             view.showView(viewName);
-            System.out.println("Showing Login Panel");
+        } catch (Exception e) {
+            // Exception will never be thrown
+            JOptionPane.showMessageDialog(view, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
-        else if (viewName.equals("Admin Dashboard")) {
-            currentController = new AdminDashboardController((AdminDashboard) currentView);
-            view.showView(viewName);
-            System.out.println("Showing Admin Dashboard");
-        }
-
-        if (currentView == null) {
-            System.out.println("View requested not found: " + viewName);
-            return;
-        }
-
-        // Keep track of the current view and controller
-        currentViewName = viewName;
-        currentControllerName = View.getControllerName(viewName);
     }
 
 }

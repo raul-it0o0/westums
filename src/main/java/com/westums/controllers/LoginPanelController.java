@@ -1,20 +1,18 @@
 package com.westums.controllers;
 
-import com.westums.models.DatabaseManager;
+import com.westums.models.Authenticator;
 import com.westums.views.LoginPanel;
 import com.westums.views.View;
 
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.util.ArrayList;
-import java.util.function.Consumer;
 
-public class LoginPanelController implements ActionListener, CaretListener, ComponentListener {
+public class LoginPanelController implements ActionListener, CaretListener {
 
     LoginPanel view;
 
@@ -22,10 +20,11 @@ public class LoginPanelController implements ActionListener, CaretListener, Comp
     private boolean userHadPassword;
     private boolean passwordFetched;
     private String hashedPassword;
-    private DatabaseManager.AccountType accountType;
+    private Authenticator.AccountType accountType;
 
-    public LoginPanelController(LoginPanel loginPanelInstance) {
-        this.view = loginPanelInstance;
+    public LoginPanelController(Container loginPanelInstance) {
+
+        this.view = (LoginPanel) loginPanelInstance;
 
         // Helper fields
         userHadPassword = false;
@@ -36,38 +35,23 @@ public class LoginPanelController implements ActionListener, CaretListener, Comp
     }
 
     private void registerAsListener() {
-        // Register this controller as a listener
-        //  to the components which need to be listened to
-        // TODO: Remove the if blocks
-        if (!Controller.isListenerOf(this, view.signInButton, ActionListener.class)) {
-            view.signInButton.addActionListener(this);
-            view.signInButton.setActionCommand("Sign In Button Pressed");
-        }
 
-        if (!Controller.isListenerOf(this, view.passwordField, ActionListener.class)) {
-            view.passwordField.addActionListener(this);
-            view.passwordField.setActionCommand("Password Field Filled");
-        }
+        // Register as listener
+        view.signInButton.addActionListener(this);
+        view.signInButton.setActionCommand("Sign In Button Pressed");
 
-        if (!Controller.isListenerOf(this, view.emailField, ActionListener.class)) {
-            view.emailField.addActionListener(this);
-            view.emailField.setActionCommand("Email Field Filled");
-        }
+        view.passwordField.addActionListener(this);
+        view.passwordField.setActionCommand("Password Field Filled");
 
-        if (!Controller.isListenerOf(this, view.emailField, CaretListener.class)) {
-            view.emailField.addCaretListener(this);
-        }
+        view.emailField.addActionListener(this);
+        view.emailField.setActionCommand("Email Field Filled");
 
-        if (!Controller.isListenerOf(this, view.passwordField, CaretListener.class)) {
-            view.passwordField.addCaretListener(this);
-        }
+        view.emailField.addCaretListener(this);
 
-        if (!Controller.isListenerOf(this, view, ComponentListener.class)) {
-            view.addComponentListener(this);
-        }
+        view.passwordField.addCaretListener(this);
     }
 
-    private void redirectView(DatabaseManager.AccountType accountType) {
+    private void redirectView(Authenticator.AccountType accountType) {
         switch (accountType) {
             case ADMIN:
                 MainController.show(View.ADMIN_DASHBOARD);
@@ -83,7 +67,6 @@ public class LoginPanelController implements ActionListener, CaretListener, Comp
         }
     }
 
-    // Define behaviour with user interaction
     @Override
     public void actionPerformed(ActionEvent event) {
 
@@ -96,9 +79,12 @@ public class LoginPanelController implements ActionListener, CaretListener, Comp
         if (event.getActionCommand().equals("Sign In Button Pressed") ||
                 event.getActionCommand().equals("Email Field Filled") ||
                 event.getActionCommand().equals("Password Field Filled")) {
-            // Trim any whitespace
+
+            // Trim any whitespace from email and password fields
             view.emailField.setText(view.emailField.getText().trim());
             view.passwordField.setText(new String(view.passwordField.getPassword()).trim());
+
+            // Error checking for email field
             if (view.emailField.getText().isEmpty()) {
                 // Display error message
                 view.emailErrorLabel.setVisible(true);
@@ -107,6 +93,7 @@ public class LoginPanelController implements ActionListener, CaretListener, Comp
                 return;
             }
 
+            // Error checking for password field
             if (view.passwordPanel.isVisible() && view.passwordField.getPassword().length == 0) {
                 // Display error message
                 view.passwordErrorLabel.setVisible(true);
@@ -115,14 +102,19 @@ public class LoginPanelController implements ActionListener, CaretListener, Comp
                 return;
             }
 
+            // If password not searched for yet
             if (!passwordFetched) {
+
+                // Check if email exists in the database
                 String enteredEmail = view.emailField.getText();
                 ArrayList<Object> list;
                 try {
-                    list = DatabaseManager.isValidEmail(enteredEmail);
+                    list = Authenticator.getPasswordAndUserTypeByEmail(enteredEmail);
                     if (list != null) {
+                        // If email is found,
+                        // get the hashed password and account type
                         hashedPassword = (String) list.get(0);
-                        accountType = DatabaseManager.AccountType.valueOf(String.valueOf(list.get(1)));
+                        accountType = Authenticator.AccountType.valueOf(String.valueOf(list.get(1)));
                     }
                 }
                 catch (java.sql.SQLException e) {
@@ -151,12 +143,12 @@ public class LoginPanelController implements ActionListener, CaretListener, Comp
 
                 // If no password set (found null in DB)
                 // Prompt user to add password
-                if (hashedPassword.equals("null")) {
+                if (hashedPassword == null) {
                     userHadPassword = false;
                     view.inputDescriptionLabel.setVisible(true);
                 }
                 else {
-                userHadPassword = true;
+                    userHadPassword = true;
                 }
 
                 view.revalidate();
@@ -164,10 +156,12 @@ public class LoginPanelController implements ActionListener, CaretListener, Comp
                 return;
             }
 
+            // Password already fetched
             String enteredEmail = view.emailField.getText();
             String enteredPassword = new String(view.passwordField.getPassword());
             if (userHadPassword) {
-                if (DatabaseManager.isValidPassword(enteredPassword, hashedPassword)) {
+                // Check if entered password matches the hashed password
+                if (Authenticator.isMatchingPassword(enteredPassword, hashedPassword)) {
                     redirectView(accountType);
                     return;
                 }
@@ -178,8 +172,10 @@ public class LoginPanelController implements ActionListener, CaretListener, Comp
                 view.repaint();
             }
             else {
+                // User had no password set
                 try {
-                    DatabaseManager.insertPassword(enteredEmail, enteredPassword);
+
+                    Authenticator.insertPassword(enteredEmail, enteredPassword);
                     redirectView(accountType);
                 }
                 catch (java.sql.SQLException e) {
@@ -200,44 +196,6 @@ public class LoginPanelController implements ActionListener, CaretListener, Comp
             view.revalidate();
             view.repaint();
         }
-    }
-
-    @Override
-    public void componentResized(ComponentEvent e) {
-        return;
-    }
-
-    @Override
-    public void componentMoved(ComponentEvent e) {
-        return;
-    }
-
-    @Override
-    public void componentShown(ComponentEvent e) {
-        return;
-    }
-
-    @Override
-    public void componentHidden(ComponentEvent event) {
-        if (event.getSource() == view) {
-            resetViewFields();
-            passwordFetched = false;
-        }
-    }
-
-    private void resetViewFields() {
-        view.passwordPanel.setVisible(false);
-        view.inputDescriptionLabel.setVisible(false);
-        view.emailErrorLabel.setVisible(false);
-        view.passwordErrorLabel.setVisible(false);
-        view.emailField.setText(null);
-        view.passwordField.setText(null);
-        view.emailField.setEditable(true);
-
-        registerAsListener();
-
-        view.revalidate();
-        view.repaint();
     }
 
 }

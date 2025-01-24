@@ -44,3 +44,9 @@ bin/
 ### Custom ###
 /src/main/java/com/westums/controllers/Controller.java
 /src/main/java/com/westums/views/designs/
+
+### Unimplemented ###
+/src/main/java/com/westums/controllers/admindashboard/ViewStudentsDialogController.java
+src/main/java/com/westums/views/admindashboard/ViewStudentsDialog.java
+src/main/java/com/westums/models/StudentsTableModel.java
+src/main/java/com/westums/models/CustomTableCellRenderer.java

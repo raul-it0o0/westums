@@ -1,10 +1,9 @@
-package com.westums.views;
+package com.westums.views.admindashboard;
 
 import com.westums.models.StudentsTableModel;
 
 import java.awt.*;
 import javax.swing.*;
-import javax.swing.table.*;
 
 /**
  * @author Raul
