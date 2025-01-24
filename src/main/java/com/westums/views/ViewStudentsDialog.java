@@ -33,8 +33,8 @@ public class ViewStudentsDialog extends JDialog {
             studentsTable.setForeground(Color.white);
             studentsTable.setFillsViewportHeight(true);
             studentsTable.setModel(studentsTableModel);
-            studentsTable.setDefaultRenderer(Object.class, new StudentsTableCellRenderer());
-            studentsTable.getTableHeader().setDefaultRenderer(new StudentsTableCellRenderer(studentsTable));
+//            studentsTable.setDefaultRenderer(Object.class, new StudentsTableCellRenderer());
+//            studentsTable.getTableHeader().setDefaultRenderer(new StudentsTableCellRenderer(studentsTable));
             tableScrollPane.setViewportView(studentsTable);
         }
         contentPane.add(tableScrollPane, BorderLayout.CENTER);

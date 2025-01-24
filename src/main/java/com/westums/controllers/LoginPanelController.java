@@ -2,6 +2,7 @@ package com.westums.controllers;
 
 import com.westums.models.DatabaseManager;
 import com.westums.views.LoginPanel;
+import com.westums.views.View;
 
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
@@ -16,7 +17,6 @@ import java.util.function.Consumer;
 public class LoginPanelController implements ActionListener, CaretListener, ComponentListener {
 
     LoginPanel view;
-    Consumer<String> showCardMethod;
 
     // Helper fields
     private boolean userHadPassword;
@@ -24,9 +24,8 @@ public class LoginPanelController implements ActionListener, CaretListener, Comp
     private String hashedPassword;
     private DatabaseManager.AccountType accountType;
 
-    public LoginPanelController(LoginPanel loginPanelInstance, Consumer<String> switchCard) {
+    public LoginPanelController(LoginPanel loginPanelInstance) {
         this.view = loginPanelInstance;
-        this.showCardMethod = switchCard;
 
         // Helper fields
         userHadPassword = false;
@@ -39,6 +38,7 @@ public class LoginPanelController implements ActionListener, CaretListener, Comp
     private void registerAsListener() {
         // Register this controller as a listener
         //  to the components which need to be listened to
+        // TODO: Remove the if blocks
         if (!Controller.isListenerOf(this, view.signInButton, ActionListener.class)) {
             view.signInButton.addActionListener(this);
             view.signInButton.setActionCommand("Sign In Button Pressed");
@@ -70,14 +70,14 @@ public class LoginPanelController implements ActionListener, CaretListener, Comp
     private void redirectView(DatabaseManager.AccountType accountType) {
         switch (accountType) {
             case ADMIN:
-                showCardMethod.accept("Admin Dashboard");
+                MainController.show(View.ADMIN_DASHBOARD);
                 break;
             case PROFESSOR:
-                showCardMethod.accept("Professor Dashboard");
+                MainController.show("Professor Dashboard");
                 System.out.println("Professor Dashboard");
                 break;
             case STUDENT:
-                showCardMethod.accept("Student Dashboard");
+                MainController.show("Student Dashboard");
                 System.out.println("Student Dashboard");
                 break;
         }

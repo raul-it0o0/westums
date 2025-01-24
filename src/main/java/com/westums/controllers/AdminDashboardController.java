@@ -3,6 +3,7 @@ package com.westums.controllers;
 import com.westums.models.*;
 import com.westums.models.InputVerifier;
 import com.westums.views.AdminDashboard;
+import com.westums.views.View;
 import com.westums.views.ViewStudentsDialog;
 import com.westums.views.designs.ViewStudentsDialogDesign;
 
@@ -24,9 +25,8 @@ public class AdminDashboardController implements ActionListener, TreeSelectionLi
     private DefaultListSelectionModel selectableListSelectionModel;
     private DefaultListSelectionModel nonSelectableListSelectionModel;
 
-    AdminDashboardController(AdminDashboard adminDashboardInstance, Consumer<String> switchCard) {
+    AdminDashboardController(AdminDashboard adminDashboardInstance) {
         this.view = adminDashboardInstance;
-        this.showCardMethod = switchCard;
         this.selectableListSelectionModel = (DefaultListSelectionModel) view.courseList.getSelectionModel();
         this.nonSelectableListSelectionModel = new NonSelectableListSelectionModel();
 
@@ -372,6 +372,7 @@ public class AdminDashboardController implements ActionListener, TreeSelectionLi
 
     @Override
     public void valueChanged(TreeSelectionEvent e) {
+
         // Get the name of the selected node (readability)
         String selectedNodeName = e.getPath().getLastPathComponent().toString();
 
@@ -419,7 +420,7 @@ public class AdminDashboardController implements ActionListener, TreeSelectionLi
     @Override
     public void mouseClicked(MouseEvent event) {
         if (event.getSource() == view.logoutPanel) {
-            showCardMethod.accept("Login Panel");
+            MainController.show(View.LOGIN_PANEL);
             return;
         }
 

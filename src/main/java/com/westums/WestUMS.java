@@ -15,7 +15,7 @@ public class WestUMS {
             @Override
             public void run() {
                 initUISettings();
-                MainController mainController = new MainController(new MainFrame());
+                MainController.initialize();
             }
         });
     }
