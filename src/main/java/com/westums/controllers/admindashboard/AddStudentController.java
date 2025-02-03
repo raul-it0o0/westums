@@ -22,6 +22,11 @@ import java.util.Date;
 public class AddStudentController implements ActionListener, DocumentListener, MouseListener, PropertyChangeListener {
 
     AddStudentCard view;
+    private boolean validFields;
+
+    public boolean hasValidFields() {
+        return validFields;
+    }
 
     public AddStudentController(Container addStudentCardInstance) {
 
@@ -39,6 +44,9 @@ public class AddStudentController implements ActionListener, DocumentListener, M
         view.studentDateChooser.addMouseListener(this);
 
         view.studentDateChooser.addPropertyChangeListener(this);
+
+        // Upon view initialization, none of the fields are valid
+        validFields = false;
 
     }
 
@@ -68,6 +76,8 @@ public class AddStudentController implements ActionListener, DocumentListener, M
         view.studentNameField.setText("");
         view.studentSurnameField.setText("");
         view.generatedStudentEmailField.setText("");
+        // Since fields are cleared, they are not valid
+        validFields = false;
         view.revalidate();
         view.repaint();
     }
@@ -110,7 +120,10 @@ public class AddStudentController implements ActionListener, DocumentListener, M
         }
 
         // To generate email, both name and surname fields must be valid
-        if (!nameValid || !surnameValid) return;
+        if (!nameValid || !surnameValid) {
+            validFields = false;
+            return;
+        }
 
         // Generate email and display it
         try {
@@ -122,6 +135,8 @@ public class AddStudentController implements ActionListener, DocumentListener, M
         }
         // Enable add student button
         view.addStudentButton.setEnabled(true);
+        // Mark fields as valid
+        validFields = true;
     }
 
     @Override
@@ -131,17 +146,13 @@ public class AddStudentController implements ActionListener, DocumentListener, M
     }
 
     @Override
-    public void changedUpdate(DocumentEvent e) {
-
-    }
-
-    @Override
     public void removeUpdate(DocumentEvent e) {
         insertUpdate(e);
     }
 
     @Override
     public void insertUpdate(DocumentEvent event) {
+
         // Clear the error label on the field the document change came from
         if (event.getDocument().equals(view.studentNameField.getDocument()))
             view.studentNameErrorLabel.setVisible(false);
@@ -186,6 +197,30 @@ public class AddStudentController implements ActionListener, DocumentListener, M
         }
     }
 
+    /**
+     * Submit changes to the database (simulate pressing the add student button)
+     * @return 0 if successful, 1 if an SQLException occurred
+     */
+    public int submitChanges() {
+        // Assume all fields are valid
+
+        // Get field data
+        String email = view.generatedStudentEmailField.getText().trim();
+        String name = view.studentNameField.getText().trim();
+        String surname = view.studentSurnameField.getText().trim();
+        Date dateOfBirth = view.studentDateChooser.getDate();
+
+        // Add student to the database
+        try {
+            Admin.addAccount(email, Authenticator.AccountType.STUDENT, name, surname, dateOfBirth);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            return 1;
+        }
+
+        return 0;
+    }
+
     @Override
     public void mousePressed(MouseEvent e) {
 
@@ -203,6 +238,11 @@ public class AddStudentController implements ActionListener, DocumentListener, M
 
     @Override
     public void mouseExited(MouseEvent e) {
+
+    }
+
+    @Override
+    public void changedUpdate(DocumentEvent e) {
 
     }
 }

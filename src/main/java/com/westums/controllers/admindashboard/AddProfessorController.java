@@ -22,6 +22,11 @@ import javax.swing.event.DocumentListener;
 public class AddProfessorController implements ActionListener, DocumentListener, MouseListener, PropertyChangeListener {
 
     AddProfessorCard view;
+    private boolean validFields;
+
+    public boolean hasValidFields() {
+        return validFields;
+    }
 
     public AddProfessorController(Container addProfessorCardInstance) {
 
@@ -40,6 +45,8 @@ public class AddProfessorController implements ActionListener, DocumentListener,
 
         view.professorDateChooser.addPropertyChangeListener(this);
 
+        // Upon view initialization, none of the fields are valid
+        validFields = false;
     }
 
     /**
@@ -80,7 +87,10 @@ public class AddProfessorController implements ActionListener, DocumentListener,
         }
 
         // To generate email, both name and surname fields must be valid
-        if (!nameValid || !surnameValid) return;
+        if (!nameValid || !surnameValid) {
+            validFields = false;
+            return;
+        }
 
         // Generate email and display it
         try {
@@ -92,6 +102,8 @@ public class AddProfessorController implements ActionListener, DocumentListener,
         }
         // Enable add professor button
         view.addProfessorButton.setEnabled(true);
+        // Mark fields as valid
+        validFields = true;
     }
 
     @Override
@@ -125,6 +137,8 @@ public class AddProfessorController implements ActionListener, DocumentListener,
         view.professorNameField.setText("");
         view.professorSurnameField.setText("");
         view.generatedProfessorEmailField.setText("");
+        // Since fields are cleared, they are not valid
+        validFields = false;
         view.revalidate();
         view.repaint();
     }
@@ -183,6 +197,30 @@ public class AddProfessorController implements ActionListener, DocumentListener,
 
             return;
         }
+    }
+
+    /**
+     * Submit changes to the database (simulate pressing the add professor button)
+     * @return 0 if successful, 1 if an SQLException occurred
+     */
+    public int submitChanges() {
+        // Assume all fields are valid
+
+        // Get field data
+        String email = view.generatedProfessorEmailField.getText().trim();
+        String name = view.professorNameField.getText().trim();
+        String surname = view.professorSurnameField.getText().trim();
+        Date dateOfBirth = view.professorDateChooser.getDate();
+
+        // Add professor to the database
+        try {
+            Admin.addAccount(email, Authenticator.AccountType.PROFESSOR, name, surname, dateOfBirth);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            return 1;
+        }
+
+        return 0;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.westums.controllers.admindashboard;
 
 import com.westums.models.Admin;
+import com.westums.models.Authenticator;
 import com.westums.models.InputVerifier;
 import com.westums.views.admindashboard.AddCourseCard;
 import com.westums.views.customui.JAddButton;
@@ -14,10 +15,16 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.sql.SQLException;
+import java.util.Date;
 
 public class AddCourseController implements ActionListener, DocumentListener, MouseListener {
 
     AddCourseCard view;
+    private boolean validFields;
+
+    public boolean hasValidFields() {
+        return validFields;
+    }
 
     public AddCourseController(Container addCourseCardInstance) {
 
@@ -35,6 +42,9 @@ public class AddCourseController implements ActionListener, DocumentListener, Mo
 
         view.courseTypeComboBox.addActionListener(this);
         view.courseTypeComboBox.setActionCommand("Course type selected");
+
+        // Upon view initialization, none of the fields are valid
+        validFields = false;
     }
 
     /**
@@ -112,10 +122,15 @@ public class AddCourseController implements ActionListener, DocumentListener, Mo
         // To enable the add course button, all fields must be valid
         if (!nameValid
                 || !professorEmailValid
-                || !courseTypeSelected) return;
+                || !courseTypeSelected) {
+            validFields = false;
+            return;
+        }
 
         // Enable add course button
         view.addCourseButton.setEnabled(true);
+        // Mark fields as valid
+        validFields = true;
     }
 
     @Override
@@ -134,7 +149,7 @@ public class AddCourseController implements ActionListener, DocumentListener, Mo
             // Get field data
             String courseName = view.courseNameField.getText().trim();
             String professorEmail = view.courseProfessorEmailField.getText().trim();
-            String courseType = (String)view.courseTypeComboBox.getSelectedItem();
+            String courseType = (String) view.courseTypeComboBox.getSelectedItem();
 
             // Add course to the database
             try {
@@ -149,6 +164,8 @@ public class AddCourseController implements ActionListener, DocumentListener, Mo
             // Clear all fields
             view.courseNameField.setText("");
             view.courseProfessorEmailField.setText("");
+            // Since fields are cleared, they are not valid
+            validFields = false;
             view.revalidate();
             view.repaint();
         }
@@ -198,6 +215,29 @@ public class AddCourseController implements ActionListener, DocumentListener, Mo
 
         view.revalidate();
         view.repaint();
+    }
+
+    /**
+     * Submit changes to the database (simulate pressing the add course button)
+     * @return 0 if successful, 1 if an SQLException occurred
+     */
+    public int submitChanges() {
+        // Assume all fields are valid
+
+        // Get field data
+        String courseName = view.courseNameField.getText().trim();
+        String professorEmail = view.courseProfessorEmailField.getText().trim();
+        String courseType = (String) view.courseTypeComboBox.getSelectedItem();
+
+        // Add course to the database
+        try {
+            Admin.addCourse(courseName, professorEmail, courseType);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            return 1;
+        }
+
+        return 0;
     }
 
     @Override

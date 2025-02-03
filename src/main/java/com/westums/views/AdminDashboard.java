@@ -60,7 +60,8 @@ public class AdminDashboard extends JPanel {
      */
     public void removeCurrentView() {
         // Only one view will be in the card layout at a time
-        formPanel.remove(1);
+        if (formPanel.getComponentCount() > 1)
+            formPanel.remove(1);
     }
 
     private void initComponents() {

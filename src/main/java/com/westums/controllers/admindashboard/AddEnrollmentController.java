@@ -23,6 +23,15 @@ public class AddEnrollmentController implements MouseListener, DocumentListener,
 
     AddEnrollmentCard view;
 
+    /**
+     * Becomes true when email is filled, and any changes are made to the student's enrollments.
+     */
+    private boolean validFields;
+
+    public boolean hasValidFields() {
+        return validFields;
+    }
+
     private DefaultListSelectionModel selectableListSelectionModel;
     private NonSelectableListSelectionModel nonSelectableListSelectionModel;
 
@@ -49,6 +58,9 @@ public class AddEnrollmentController implements MouseListener, DocumentListener,
         // Make course list non-selectable
         this.nonSelectableListSelectionModel = new NonSelectableListSelectionModel();
         view.courseList.setSelectionModel(nonSelectableListSelectionModel);
+
+        // Upon view initialization, none of the fields are valid
+        validFields = false;
 
     }
 
@@ -88,6 +100,9 @@ public class AddEnrollmentController implements MouseListener, DocumentListener,
             // Clear all fields
             view.studentEnrollmentEmailField.setText("");
             view.courseList.clearSelection();
+            // Since fields are cleared, no modifications are made
+            // to keep the user from switching views or logging out
+            validFields = false;
             view.revalidate();
             view.repaint();
         }
@@ -137,6 +152,10 @@ public class AddEnrollmentController implements MouseListener, DocumentListener,
             view.repaint();
             return;
         }
+        else {
+            if (view.studentEnrollmentEmailInvalidLabel.isVisible())
+                view.studentEnrollmentEmailInvalidLabel.setVisible(false);
+        }
 
         try {
             studentID = Admin.getStudentIDWithEmail(studentEmail);
@@ -173,6 +192,9 @@ public class AddEnrollmentController implements MouseListener, DocumentListener,
     public void insertUpdate(DocumentEvent event) {
         // Stop listening for changes in the list selection
         view.courseList.removeListSelectionListener(this);
+        // The modifications of the field should not
+        // keep the user from switching views or logging out
+        validFields = false;
 
         // Clear the label on the field the document change came from
         if (event.getDocument().equals(view.studentEnrollmentEmailField.getDocument())) {
@@ -208,9 +230,33 @@ public class AddEnrollmentController implements MouseListener, DocumentListener,
     @Override
     public void valueChanged(ListSelectionEvent e) {
         // When any value in the list is selected or deselected
+        // Mark the fields as modified
+        validFields = true;
         // Enable add enrollment button, if not enabled already
         if (!view.addEnrollmentButton.isEnabled())
             view.addEnrollmentButton.setEnabled(true);
+    }
+
+    /**
+     * Submit changes to the database (simulate pressing the add enrollment button)
+     * @return 0 if successful, 1 if an SQLException occurred
+     */
+    public int submitChanges() {
+        // Assume all fields are valid
+
+        // Get field data
+        String studentEmail = view.studentEnrollmentEmailField.getText().trim();
+
+        // Update enrollments
+        try {
+            Admin.updateEnrollments(Admin.getStudentIDWithEmail(studentEmail),
+                    view.courseList.getSelectedValuesList());
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            return 1;
+        }
+
+        return 0;
     }
 
     @Override

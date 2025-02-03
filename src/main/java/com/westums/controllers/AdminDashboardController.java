@@ -9,12 +9,14 @@ import javax.swing.*;
 import javax.swing.event.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.logging.Logger;
 
 public class AdminDashboardController implements TreeSelectionListener, MouseListener  {
 
     private static AdminDashboard view;
     ViewStudentsDialogController viewStudentsDialogController;
+    boolean ignoreTreeSelection = false;
 
     // TODO: This field will hold the current subview controller
     //  This is to access the controller's "fields modified" field
@@ -66,11 +68,91 @@ public class AdminDashboardController implements TreeSelectionListener, MouseLis
         view.logoutPanel.addMouseListener(this);
     }
 
+    /**
+     * Handle unsaved changes when switching panels
+     * or logging out
+     * @return 0 if view can be switched, 1 if view cannot be switched
+     */
+    private int handleUnsavedChanges() {
+        // Create new JOptionPane
+        String message = "You have unsubmitted modifications. Do you want to submit them?";
+        String title = "Unsaved Changes";
+        String[] options = {"Yes", "No", "Cancel"};
+
+        int option = JOptionPane.showOptionDialog(view, message, title,
+                JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE,
+                null, options, options[2]);
+
+        switch (option) {
+            case JOptionPane.YES_OPTION -> {
+                // User wants to submit changes, and if successful, switch views
+                try {
+                    option = (int)currentController.getClass()
+                            .getMethod("submitChanges")
+                            .invoke(currentController);
+                    if (option == 1) {
+                        // A database error occured while trying to submit changes
+                        // Do not switch views
+                        return 1;
+                    }
+
+                    // Otherwise, display submitted changes dialog
+                    JOptionPane.showMessageDialog(view, "Changes submitted successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    // Switch views (by returning with 0)
+                    return 0;
+
+                } catch (Exception e) {
+                    // Exception will never be thrown
+                    return 1;
+                }
+            }
+            case JOptionPane.NO_OPTION -> {
+                // User does not want to submit changes, and simply just switch views
+                return 0;
+            }
+            case JOptionPane.CANCEL_OPTION -> {
+                // User wants to cancel the view switch
+                return 1;
+            }
+            default -> {
+                // User closes the dialog
+                return 1;
+            }
+        }
+    }
+
     @Override
-    public void valueChanged(TreeSelectionEvent e) {
+    public void valueChanged(TreeSelectionEvent event) {
+        if (ignoreTreeSelection) {
+            ignoreTreeSelection = false;
+            return;
+        }
+
+        // Check for modified fields in the current view
+        if (currentController != null) {
+            try {
+                // Check if the fields are modified and valid
+                // NOTE: If fields are modified (filled) but not valid, changes are lost
+                if ((boolean) currentController.getClass().getMethod("hasValidFields").invoke(currentController)) {
+                    // Show unsaved changes dialog
+                    if (handleUnsavedChanges() == 1) {
+                        // User wants to cancel the view switch
+                        // Restore the tree selection, ensuring the method that
+                        // got triggered by the tree selection event does not run
+                        ignoreTreeSelection = true;
+                        view.optionTree.setSelectionPath(event.getOldLeadSelectionPath());
+                        return;
+                    }
+                    // Otherwise, continue in the method, and switch views
+                }
+            } catch (Exception e) {
+                // Exception will never be thrown
+                JOptionPane.showMessageDialog(view, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
 
         // Get the name of the selected node
-        String selectedNodeName = e.getPath().getLastPathComponent().toString();
+        String selectedNodeName = event.getPath().getLastPathComponent().toString();
 
         switch (selectedNodeName) {
             case "Add Student" -> {
@@ -94,8 +176,31 @@ public class AdminDashboardController implements TreeSelectionListener, MouseLis
     @Override
     public void mouseClicked(MouseEvent event) {
         if (event.getSource() == view.logoutPanel) {
-            // NOTE: The method sets the AdminDashboard view (and controller) to null
-            //  and therefore the currently visible card view (and controller) to null
+
+            // Check for modified fields in the current view
+            if (currentController != null) {
+                try {
+                    // Check if the fields in the current view are modified and valid
+                    // NOTE: If fields are modified (filled) but not valid, changes are lost
+                    if ((boolean) currentController.getClass().getMethod("hasValidFields").invoke(currentController)) {
+                        // Show unsaved changes dialog
+                        if (handleUnsavedChanges() == 1) {
+                            // User wants to cancel the view switch
+                            // Return, do not switch views
+                            return;
+                        }
+                        // Otherwise, continue in the method, and switch views
+                    }
+                } catch (Exception e) {
+                    // Exception will never be thrown
+                    JOptionPane.showMessageDialog(view, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+
+            // Set the current view and controller to null
+            // to force re-instantiation when the user logs back in
+            currentView = null;
+            currentController = null;
             MainController.show(View.LOGIN_PANEL);
         }
     }

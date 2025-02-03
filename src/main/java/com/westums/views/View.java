@@ -63,4 +63,35 @@ public class View {
         }
     }
 
+    /**
+     * Used to restore tree selection in the AdminDashboard
+     * @param viewClass
+     * @return
+     */
+    public static String getViewDisplayName(Class<?> viewClass) {
+        switch (viewClass.getName()) {
+            case "com.westums.views.LoginPanel" -> {
+                return "Login Panel";
+            }
+            case "com.westums.views.AdminDashboard" -> {
+                return "Admin Dashboard";
+            }
+            case "com.westums.views.admindashboard.AddStudentCard" -> {
+                return "Add Student";
+            }
+            case "com.westums.views.admindashboard.AddProfessorCard" -> {
+                return "Add Professor";
+            }
+            case "com.westums.views.admindashboard.AddCourseCard" -> {
+                return "Add Course";
+            }
+            case "com.westums.views.admindashboard.AddEnrollmentCard" -> {
+                return "Add Enrollment";
+            }
+            default -> {
+                throw new IllegalArgumentException("View not found: " + viewClass.getName());
+            }
+        }
+    }
+
 }
