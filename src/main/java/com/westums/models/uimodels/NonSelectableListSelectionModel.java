@@ -1,4 +1,4 @@
-package com.westums.models;
+package com.westums.models.uimodels;
 
 import javax.swing.*;
 

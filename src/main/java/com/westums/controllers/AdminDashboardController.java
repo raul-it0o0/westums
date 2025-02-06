@@ -2,6 +2,7 @@ package com.westums.controllers;
 
 import com.westums.controllers.admindashboard.*;
 import com.westums.views.AdminDashboard;
+import com.westums.views.MainFrame;
 import com.westums.views.View;
 import com.westums.views.admindashboard.*;
 
@@ -15,13 +16,10 @@ import java.util.logging.Logger;
 public class AdminDashboardController implements TreeSelectionListener, MouseListener  {
 
     private static AdminDashboard view;
+    private static MainFrame mainFrame;
     ViewStudentsDialogController viewStudentsDialogController;
-    boolean ignoreTreeSelection = false;
+    static boolean ignoreTreeSelection = false;
 
-    // TODO: This field will hold the current subview controller
-    //  This is to access the controller's "fields modified" field
-    //  To display the "unsaved changes" dialog when user wants to switch views
-    //  or log out
     private static Object currentView = null;
     private static Object currentController = null;
 
@@ -36,6 +34,21 @@ public class AdminDashboardController implements TreeSelectionListener, MouseLis
         // Remove the current controller
         if (currentController != null) {
             currentController = null;
+        }
+
+        if (viewName == null) {
+            // Default card will be shown
+            ignoreTreeSelection = true;
+            view.optionTree.clearSelection();
+            return;
+        }
+
+        if (viewName.equals(View.IMPORT_DIALOG)) {
+            currentView = new ImportDialog(mainFrame);
+            currentController = new ImportDialogController((ImportDialog) currentView);
+            view.showView(View.IMPORT_DIALOG);
+            ((ImportDialog) currentView).setVisible(true);
+            return;
         }
 
         // Instantiate the view from AdminDashboard
@@ -62,6 +75,7 @@ public class AdminDashboardController implements TreeSelectionListener, MouseLis
 
     public AdminDashboardController(Container adminDashboardInstance) {
         view = (AdminDashboard) adminDashboardInstance;
+        mainFrame = (MainFrame) view.getParent().getParent().getParent().getParent().getParent();
 
         // Register as listener
         view.optionTree.addTreeSelectionListener(this);
@@ -166,6 +180,9 @@ public class AdminDashboardController implements TreeSelectionListener, MouseLis
             }
             case "Add Enrollment" -> {
                 show(View.ADD_ENROLLMENT_CARD);
+            }
+            case "Import..." -> {
+                show(View.IMPORT_DIALOG);
             }
             default -> {
                 view.showCard("Default Card");

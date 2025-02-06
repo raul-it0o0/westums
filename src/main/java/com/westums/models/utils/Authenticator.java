@@ -1,4 +1,4 @@
-package com.westums.models;
+package com.westums.models.utils;
 
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -19,6 +19,18 @@ public class Authenticator {
         PROFESSOR,
         STUDENT,
         ADMIN
+    }
+
+    public static String toDBEnum(AccountType accountType) {
+        switch (accountType) {
+            case PROFESSOR:
+                return "Professor";
+            case STUDENT:
+                return "Student";
+            case ADMIN:
+                return "Admin";
+        }
+        return null;
     }
 
     /**

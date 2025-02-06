@@ -1,6 +1,8 @@
 package com.westums.views.admindashboard;
 
 import com.westums.models.*;
+import com.westums.models.uimodels.CourseAddEnrollmentListCellRenderer;
+import com.westums.models.uimodels.SelectableListSelectionModel;
 import com.westums.views.customui.JAddButton;
 import net.miginfocom.swing.MigLayout;
 import org.jdesktop.swingx.JXFormattedTextField;
@@ -10,8 +12,6 @@ import org.kordamp.ikonli.swing.FontIcon;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
-import java.sql.SQLException;
-import java.util.ArrayList;
 
 public class AddEnrollmentCard extends JPanel {
 

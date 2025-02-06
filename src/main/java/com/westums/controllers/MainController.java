@@ -1,15 +1,11 @@
 package com.westums.controllers;
 
-import com.westums.models.DatabaseConnection;
-import com.westums.views.AdminDashboard;
-import com.westums.views.LoginPanel;
+import com.westums.models.utils.DatabaseConnection;
 import com.westums.views.MainFrame;
 import com.westums.views.View;
 
 import javax.swing.*;
 import java.awt.*;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
 
 public class MainController {
 

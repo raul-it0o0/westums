@@ -1,8 +1,8 @@
 package com.westums.controllers.admindashboard;
 
 import com.westums.models.Admin;
-import com.westums.models.Authenticator;
-import com.westums.models.InputVerifier;
+import com.westums.models.utils.Authenticator;
+import com.westums.models.utils.InputVerifier;
 import com.westums.views.admindashboard.AddStudentCard;
 import com.westums.views.customui.JAddButton;
 
@@ -92,7 +92,7 @@ public class AddStudentController implements ActionListener, DocumentListener, M
         String surname = view.studentSurnameField.getText().trim();
         Date birthDate = view.studentDateChooser.getDate();
 
-        boolean nameValid = com.westums.models.InputVerifier.isValidName(name);
+        boolean nameValid = InputVerifier.isValidName(name);
         boolean surnameValid = InputVerifier.isValidName(surname);
 
         if (!nameValid) {

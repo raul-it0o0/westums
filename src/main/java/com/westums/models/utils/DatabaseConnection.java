@@ -1,6 +1,5 @@
-package com.westums.models;
+package com.westums.models.utils;
 
-import javax.swing.*;
 import java.sql.*;
 
 public class DatabaseConnection {

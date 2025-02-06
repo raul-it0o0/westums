@@ -1,8 +1,8 @@
 package com.westums.controllers.admindashboard;
 
 import com.westums.models.Admin;
-import com.westums.models.Authenticator;
-import com.westums.models.InputVerifier;
+import com.westums.models.utils.Authenticator;
+import com.westums.models.utils.InputVerifier;
 import com.westums.views.admindashboard.AddProfessorCard;
 import com.westums.views.customui.JAddButton;
 

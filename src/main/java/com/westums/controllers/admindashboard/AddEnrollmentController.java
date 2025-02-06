@@ -2,7 +2,7 @@ package com.westums.controllers.admindashboard;
 
 import com.westums.models.Admin;
 import com.westums.models.Course;
-import com.westums.models.NonSelectableListSelectionModel;
+import com.westums.models.uimodels.NonSelectableListSelectionModel;
 import com.westums.views.admindashboard.AddEnrollmentCard;
 import com.westums.views.customui.JAddButton;
 

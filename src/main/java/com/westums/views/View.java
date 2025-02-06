@@ -11,6 +11,8 @@ public class View {
     public static final String ADD_COURSE_CARD = "Add Course Card";
     public static final String ADD_ENROLLMENT_CARD = "Add Enrollment Card";
 
+    public static final String IMPORT_DIALOG = "Import Dialog";
+
     public static Class<?> getController(String viewName) {
         switch (viewName) {
             case "Login Panel" -> {

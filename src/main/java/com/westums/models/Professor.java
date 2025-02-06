@@ -3,9 +3,7 @@ package com.westums.models;
 import java.sql.SQLException;
 import java.util.Date;
 
-
-public class Student {
-    // TODO: Make sure to include usage of the builder pattern in the presentation
+public class Professor {
 
     private int ID;
     private String email;
@@ -14,7 +12,7 @@ public class Student {
     private Date dateOfBirth;
 
     // Constructor used by builder
-    private Student(Builder builder) {
+    private Professor(Builder builder) {
         this.ID = builder.ID;
         this.email = builder.email;
         this.name = builder.name;
@@ -27,7 +25,6 @@ public class Student {
         return new Builder(name, surname, dateOfBirth);
     }
 
-    // Getters
     public int getID() {
         return ID;
     }
@@ -56,16 +53,14 @@ public class Student {
         private String surname;
         private Date dateOfBirth;
 
-        // Required fields for creating a student
-        // TODO: Use similar "Builder" pattern, "Finder" to create a student object based on
-        //  given database identifier
-        private Builder(String name, String surname, Date dateOfBirth) throws SQLException {
+        // Required fields for creating a professor
+        public Builder(String name, String surname, Date dateOfBirth) throws SQLException {
             this.name = name;
             this.surname = surname;
             this.dateOfBirth = dateOfBirth;
 
             // Generate email based on given data
-            this.email = Admin.generateStudentEmail(name, surname, dateOfBirth);
+            this.email = Admin.generateProfessorEmail(name, surname, dateOfBirth);
         }
 
         // Optional fields
@@ -79,9 +74,9 @@ public class Student {
             return this;
         }
 
-        public Student build() {
-            return new Student(this);
+        // Build the student
+        public Professor build() {
+            return new Professor(this);
         }
     }
-
 }

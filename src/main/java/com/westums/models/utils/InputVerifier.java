@@ -1,4 +1,6 @@
-package com.westums.models;
+package com.westums.models.utils;
+
+import com.westums.models.Course;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -34,5 +36,11 @@ public class InputVerifier {
 
         // If matches, then not valid hence the '!'
         return !matches;
+    }
+
+    public static boolean isValidCourseType(String input) {
+        return input.equals(Course.LECTURE)
+                || input.equals(Course.SEMINAR)
+                || input.equals(Course.LABORATORY);
     }
 }

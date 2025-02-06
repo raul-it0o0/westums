@@ -1,6 +1,6 @@
 package com.westums.controllers;
 
-import com.westums.models.Authenticator;
+import com.westums.models.utils.Authenticator;
 import com.westums.views.LoginPanel;
 import com.westums.views.View;
 
@@ -58,11 +58,9 @@ public class LoginPanelController implements ActionListener, CaretListener {
                 break;
             case PROFESSOR:
                 MainController.show("Professor Dashboard");
-                System.out.println("Professor Dashboard");
                 break;
             case STUDENT:
                 MainController.show("Student Dashboard");
-                System.out.println("Student Dashboard");
                 break;
         }
     }

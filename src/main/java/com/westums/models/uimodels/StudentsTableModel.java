@@ -1,8 +1,9 @@
-package com.westums.models;
+package com.westums.models.uimodels;
+
+import com.westums.models.Student;
 
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
 import java.util.ArrayList;
 
 public class StudentsTableModel extends AbstractTableModel {
@@ -33,7 +34,6 @@ public class StudentsTableModel extends AbstractTableModel {
             case 0 -> student.getEmail();
             case 1 -> student.getName();
             case 2 -> student.getSurname();
-            case 3 -> student.getNumberOfCoursesEnrolled();
             default -> null;
         };
     }

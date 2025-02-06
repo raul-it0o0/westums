@@ -1,12 +1,15 @@
 package com.westums.models;
 
+import com.westums.models.uimodels.NewEnrollmentsTableModel;
+import com.westums.models.utils.Authenticator;
+import com.westums.models.utils.DatabaseConnection;
+import com.westums.models.utils.JSONParser;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class Admin {
 
@@ -490,8 +493,93 @@ public class Admin {
         }
     }
 
+    public static boolean existsCourse(String name, String type) throws SQLException{
+        DatabaseConnection db = new DatabaseConnection();
 
+        String query = "SELECT * " +
+                "FROM Courses " +
+                "WHERE CourseName = ? AND CourseType = ?";
+        PreparedStatement stmt = db.connection.prepareStatement(query);
+        stmt.setString(1, name);
+        stmt.setString(2, type);
+        ResultSet rs = stmt.executeQuery();
 
+        return rs.next();
+    }
 
+    public static void importParsedData(JSONParser parser) throws SQLException{
+        // NOTE: Better to do a batch insert instead of individual inserts with existing methods
+        // Prepare queries for account, student and professor insertions
+        String accountInsertionQuery = "INSERT INTO Accounts(Email, UserType) " +
+                "VALUES (?, ?)";
+        String studentInsertionQuery = "INSERT INTO Students(Email, Name, Surname, DateOfBirth) " +
+                "VALUES (?, ?, ?, ?)";
+        String professorInsertionQuery = "INSERT INTO Professors(Email, Name, Surname, DateOfBirth) " +
+                "VALUES (?, ?, ?, ?)";
+
+        DatabaseConnection db = new DatabaseConnection();
+        PreparedStatement accountStmt = db.connection.prepareStatement(accountInsertionQuery);
+        PreparedStatement studentStmt = db.connection.prepareStatement(studentInsertionQuery);
+        PreparedStatement professorStmt = db.connection.prepareStatement(professorInsertionQuery);
+
+        for (Student student : parser.getStudentsTable().getData()) {
+            accountStmt.setString(1, student.getEmail());
+            accountStmt.setString(2, Authenticator.toDBEnum(Authenticator.AccountType.STUDENT));
+            accountStmt.addBatch();
+
+            studentStmt.setString(1, student.getEmail());
+            studentStmt.setString(2, student.getName());
+            studentStmt.setString(3, student.getSurname());
+            studentStmt.setDate(4, new java.sql.Date(student.getDateOfBirth().getTime()));
+            studentStmt.addBatch();
+        }
+
+        for (Professor professor : parser.getProfessorsTable().getData()) {
+            accountStmt.setString(1, professor.getEmail());
+            accountStmt.setString(2, Authenticator.toDBEnum(Authenticator.AccountType.PROFESSOR));
+            accountStmt.addBatch();
+
+            professorStmt.setString(1, professor.getEmail());
+            professorStmt.setString(2, professor.getName());
+            professorStmt.setString(3, professor.getSurname());
+            professorStmt.setDate(4, new java.sql.Date(professor.getDateOfBirth().getTime()));
+            professorStmt.addBatch();
+        }
+
+        accountStmt.executeBatch();
+        studentStmt.executeBatch();
+        professorStmt.executeBatch();
+
+        // Prepare queries for course insertions
+        String courseInsertionQuery = "INSERT INTO Courses(ProfessorID, CourseType, CourseName) " +
+                "VALUES((SELECT ProfessorID FROM Professors WHERE Email = ?), ?, ?)";
+        PreparedStatement courseStmt = db.connection.prepareStatement(courseInsertionQuery);
+
+        for (Course course : parser.getCoursesTable().getData()) {
+            courseStmt.setString(1, course.getProfessorEmail());
+            courseStmt.setString(2, course.getType());
+            courseStmt.setString(3, course.getName());
+            courseStmt.addBatch();
+        }
+
+        courseStmt.executeBatch();
+
+        // Prepare queries for enrollment insertions
+        String enrollmentInsertionQuery = "INSERT INTO enrollments(StudentID, CourseID) " +
+                "VALUES(" +
+                "(SELECT StudentID FROM students WHERE Email = ?), " +
+                "(SELECT CourseID FROM courses WHERE CourseName = ? AND CourseType = ?))";
+        PreparedStatement enrollmentStmt = db.connection.prepareStatement(enrollmentInsertionQuery);
+
+        for (NewEnrollmentsTableModel.Enrollment enrollment : parser.getEnrollmentsTable().getData()) {
+            enrollmentStmt.setString(1, enrollment.getStudentEmail());
+            enrollmentStmt.setString(2, enrollment.getCourseName());
+            enrollmentStmt.setString(3, enrollment.getCourseType());
+            enrollmentStmt.addBatch();
+        }
+
+        enrollmentStmt.executeBatch();
+
+    }
 
 }

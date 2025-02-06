@@ -1,8 +1,7 @@
 package com.westums.controllers.admindashboard;
 
 import com.westums.models.Admin;
-import com.westums.models.Authenticator;
-import com.westums.models.InputVerifier;
+import com.westums.models.utils.InputVerifier;
 import com.westums.views.admindashboard.AddCourseCard;
 import com.westums.views.customui.JAddButton;
 
@@ -15,7 +14,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.sql.SQLException;
-import java.util.Date;
 
 public class AddCourseController implements ActionListener, DocumentListener, MouseListener {
 

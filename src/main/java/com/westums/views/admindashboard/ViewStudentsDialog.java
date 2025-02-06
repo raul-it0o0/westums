@@ -1,6 +1,6 @@
 package com.westums.views.admindashboard;
 
-import com.westums.models.StudentsTableModel;
+import com.westums.models.uimodels.StudentsTableModel;
 
 import java.awt.*;
 import javax.swing.*;

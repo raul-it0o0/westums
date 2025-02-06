@@ -1,18 +1,10 @@
-package com.westums.models;
+package com.westums.models.uimodels;
 
-import com.westums.controllers.Controller;
+import com.westums.models.Course;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
-import javax.swing.text.View;
 import java.awt.*;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.HierarchyEvent;
-import java.awt.event.HierarchyListener;
 
 public class CourseAddEnrollmentListCellRenderer extends JPanel implements ListCellRenderer<Course> {
     private JTextPane courseName;
