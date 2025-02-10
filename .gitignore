@@ -1,10 +1,10 @@
 .gradle
 build/
-!gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
 
 ### IntelliJ IDEA ###
+.idea/
 .idea/modules.xml
 .idea/jarRepositories.xml
 .idea/compiler.xml
@@ -40,3 +40,13 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+### Unimplemented & Others ##
+/src/main/java/com/westums/controllers/Controller.java
+/src/main/java/com/westums/views/designs/
+/src/main/resources/META-INF/
+/src/main/java/com/westums/controllers/admindashboard/ViewStudentsDialogController.java
+src/main/java/com/westums/views/admindashboard/ViewStudentsDialog.java
+src/main/java/com/westums/models/StudentsTableModel.java
+src/main/java/com/westums/models/CustomTableCellRenderer.java
+/src/main/resources/unified.jsonc
