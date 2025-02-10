@@ -21,7 +21,7 @@ public class JAddButton extends JButton {
     }
 
     public void setState(int state) {
-        // TODO: Test if color changes
+        // TODO: Fix button to change its color
         switch (state) {
             case SUCCESS_STATE:
                 setBackground(new Color(0x14ae5c));

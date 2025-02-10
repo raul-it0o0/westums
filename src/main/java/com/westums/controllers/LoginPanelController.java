@@ -1,5 +1,6 @@
 package com.westums.controllers;
 
+import com.westums.models.Professor;
 import com.westums.models.utils.Authenticator;
 import com.westums.views.LoginPanel;
 import com.westums.views.View;
@@ -51,16 +52,16 @@ public class LoginPanelController implements ActionListener, CaretListener {
         view.passwordField.addCaretListener(this);
     }
 
-    private void redirectView(Authenticator.AccountType accountType) {
+    private void redirectView(Authenticator.AccountType accountType, String email) {
         switch (accountType) {
             case ADMIN:
-                MainController.show(View.ADMIN_DASHBOARD);
+                MainController.show(View.ADMIN_DASHBOARD, null);
                 break;
             case PROFESSOR:
-                MainController.show("Professor Dashboard");
+                MainController.show(View.PROFESSOR_DASHBOARD, Professor.finder(email).find());
                 break;
             case STUDENT:
-                MainController.show("Student Dashboard");
+                MainController.show("Student Dashboard", null);
                 break;
         }
     }
@@ -160,7 +161,7 @@ public class LoginPanelController implements ActionListener, CaretListener {
             if (userHadPassword) {
                 // Check if entered password matches the hashed password
                 if (Authenticator.isMatchingPassword(enteredPassword, hashedPassword)) {
-                    redirectView(accountType);
+                    redirectView(accountType, enteredEmail);
                     return;
                 }
 
@@ -174,7 +175,7 @@ public class LoginPanelController implements ActionListener, CaretListener {
                 try {
 
                     Authenticator.insertPassword(enteredEmail, enteredPassword);
-                    redirectView(accountType);
+                    redirectView(accountType, enteredEmail);
                 }
                 catch (java.sql.SQLException e) {
                     JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);

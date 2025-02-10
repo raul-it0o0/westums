@@ -57,8 +57,6 @@ public class CustomTableCellRenderer extends DefaultTableCellRenderer {
             boolean hasFocus,
             int row,
             int column) {
-        // TODO: Set the text displayed in text pane
-        //  as a field of the object
         textPane.setText("this is a cell.");
 
         panel.setBackground(new Color(0x5B5B5B));

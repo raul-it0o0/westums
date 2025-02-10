@@ -34,20 +34,83 @@ public class ImportDialogController implements ActionListener {
                 "    <ul>\n" +
                 "        <li>\n" +
                 "            If adding both new professors and students, write professors first, then students.\n" +
-                "            <pre style=\"background-color: #f0f0f0; \">\n" +
-                "                <code style=\"background-color: transparent; color: black; font-weight: 600;\">\n" +
-                "    {\n" +
-                "        \"professors\": [\n" +
+                "            <pre \n" +
+                "            style=\"background-color: #f0f0f0;\n" +
+                "            font-weight: bolder;\n" +
+                "            font-family: 'JetBrains Mono', 'Courier New', Courier, monospace;\">\n" +
+                "    \"professors\": [\n" +
                 "        {\n" +
-                "            \"name\": \"Professor 1\",\n" +
-                "            \"email\": \"\n" +
+                "            \"name\": \"Name1\",\n" +
+                "            \"surname\": \"Surname1\",\n" +
+                "            \"dateofbirth\": \"01/02/2023\" // should match specified dateformat\n" +
                 "        },\n" +
                 "        {\n" +
-                "            \"name\": \"Professor 2\",\n" +
-                "            \"email\": \"\n" +
-                "        }\n" +
-                "        ],\n" +
-                "                </code>\n" +
+                "            \"name\": // ... ,\n" +
+                "            \"email\": // ... ,\n" +
+                "            \"dateofbirth\": // ...\n" +
+                "        },\n" +
+                "        // ...\n" +
+                "    ],\n" +
+                "\n" +
+                "    \"students\": [\n" +
+                "        {\n" +
+                "            \"name\": \"Name1\",\n" +
+                "            \"surname\": \"Surname1\",\n" +
+                "            \"dateofbirth\": \"01/02/2023\",\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"name\": // ... ,\n" +
+                "            \"surname\": // ... ,\n" +
+                "            \"dateofbirth\": // ... ,\n" +
+                "        },\n" +
+                "        // ...\n" +
+                "    ]\n" +
+                "\n" +
+                "    // other fields, if any (courses, enrollments)\n" +
+                "</pre>\n" +
+                "        </li> \n" +
+                "        <li>\n" +
+                "            If declaring students and/or professors, you must declare a date format, for example:\n" +
+                "            <pre \n" +
+                "            style=\"background-color: #f0f0f0;\n" +
+                "            font-weight: bolder;\n" +
+                "            font-family: 'JetBrains Mono', 'Courier New', Courier, monospace;\">\n" +
+                "\"dateformat\": \"dd/MM/yyyy\"\n" +
+                "            </pre>\n" +
+                "            More format/patterne examples can be found <a href=\"https://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html\">here</a>.\n" +
+                "        </li>\n" +
+                "        <li>\n" +
+                "            Any parsing error due to an error in the syntax of the JSON file will cancel the parsing process and display an error. You can fix the syntax error and re-open the file again.\n" +
+                "        </li>\n" +
+                "        <li>\n" +
+                "            Enrollments can be declared either in a new course or in the enrollments field\n" +
+                "        </li>\n" +
+                "        <li>\n" +
+                "            Ensure any <code>professoremail</code> fields in <code>courses</code> refer to existing professors already in the system, or to professors declared in the <code>professors</code> field.\n" +
+                "            <pre \n" +
+                "            style=\"background-color: #f0f0f0;\n" +
+                "            font-weight: bolder;\n" +
+                "            font-family: 'JetBrains Mono', 'Courier New', Courier, monospace;\">\n" +
+                "\"professors\": [\n" +
+                "{\n" +
+                "    \"name\": \"John\"\n" +
+                "    \"surname\": \"Doe\"\n" +
+                "    \"dateofbirth\": ...\n" +
+                "]\n" +
+                "\n" +
+                "\n" +
+                "\"courses\": [\n" +
+                "{\n" +
+                "    \"name\": \"Course 1\",\n" +
+                "    \"type\": \"Lecture\",\n" +
+                "    \"professoremail\": \"john.doe@e-uvt.ro\",\n" +
+                "    \"students\":\n" +
+                "        [\n" +
+                "            // ... (if any)\n" +
+                "        ]\n" +
+                "\n" +
+                "},\n" +
+                "  // ...\n" +
                 "            </pre>\n" +
                 "        </li>\n" +
                 "    </ul>\n" +

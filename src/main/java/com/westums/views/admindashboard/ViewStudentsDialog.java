@@ -5,9 +5,6 @@ import com.westums.models.uimodels.StudentsTableModel;
 import java.awt.*;
 import javax.swing.*;
 
-/**
- * @author Raul
- */
 public class ViewStudentsDialog extends JDialog {
     public ViewStudentsDialog(Window owner) {
         super(owner, "View Students", ModalityType.MODELESS);
@@ -15,8 +12,6 @@ public class ViewStudentsDialog extends JDialog {
     }
 
     private void initComponents() {
-        // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents  @formatter:off
-        // Generated using JFormDesigner Educational license - Raul Ariton (raul.ariton05)
         tableScrollPane = new JScrollPane();
         studentsTableModel = new StudentsTableModel();
         studentsTable = new JTable();
@@ -40,14 +35,10 @@ public class ViewStudentsDialog extends JDialog {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         pack();
         setLocationRelativeTo(getOwner());
-        // JFormDesigner - End of component initialization  //GEN-END:initComponents  @formatter:on
     }
 
-    // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables  @formatter:off
-    // Generated using JFormDesigner Educational license - Raul Ariton (raul.ariton05)
     private JScrollPane tableScrollPane;
     public StudentsTableModel studentsTableModel;
     public JTable studentsTable;
-    // JFormDesigner - End of variables declaration  //GEN-END:variables  @formatter:on
 }
 

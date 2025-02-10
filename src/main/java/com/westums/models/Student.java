@@ -5,7 +5,6 @@ import java.util.Date;
 
 
 public class Student {
-    // TODO: Make sure to include usage of the builder pattern in the presentation
 
     private int ID;
     private String email;
@@ -57,8 +56,6 @@ public class Student {
         private Date dateOfBirth;
 
         // Required fields for creating a student
-        // TODO: Use similar "Builder" pattern, "Finder" to create a student object based on
-        //  given database identifier
         private Builder(String name, String surname, Date dateOfBirth) throws SQLException {
             this.name = name;
             this.surname = surname;

@@ -5,13 +5,15 @@ public class View {
     public static final String MAIN_FRAME = "Main Frame";
     public static final String LOGIN_PANEL = "Login Panel";
     public static final String ADMIN_DASHBOARD = "Admin Dashboard";
+    public static final String PROFESSOR_DASHBOARD = "Professor Dashboard";
 
     public static final String ADD_STUDENT_CARD = "Add Student Card";
     public static final String ADD_PROFESSOR_CARD = "Add Professor Card";
     public static final String ADD_COURSE_CARD = "Add Course Card";
     public static final String ADD_ENROLLMENT_CARD = "Add Enrollment Card";
-
     public static final String IMPORT_DIALOG = "Import Dialog";
+
+    public static final String COURSE_OVERVIEW_CARD = "Course Overview Card";
 
     public static Class<?> getController(String viewName) {
         switch (viewName) {
@@ -20,6 +22,9 @@ public class View {
             }
             case "Admin Dashboard" -> {
                 return com.westums.controllers.AdminDashboardController.class;
+            }
+            case "Professor Dashboard" -> {
+                return com.westums.controllers.ProfessorDashboardController.class;
             }
             case "Add Student Card" -> {
                 return com.westums.controllers.admindashboard.AddStudentController.class;
@@ -32,6 +37,12 @@ public class View {
             }
             case "Add Enrollment Card" -> {
                 return com.westums.controllers.admindashboard.AddEnrollmentController.class;
+            }
+            case "Import Dialog" -> {
+                return com.westums.controllers.admindashboard.ImportDialogController.class;
+            }
+            case "Course Overview Card" -> {
+                return com.westums.controllers.professordashboard.CourseOverviewController.class;
             }
             default -> {
                 throw new IllegalArgumentException("View not found: " + viewName);
@@ -59,6 +70,12 @@ public class View {
             case "Add Enrollment Card" -> {
                 return com.westums.views.admindashboard.AddEnrollmentCard.class;
             }
+            case "Professor Dashboard" -> {
+                return com.westums.views.ProfessorDashboard.class;
+            }
+            case "Course Overview Card" -> {
+                return com.westums.views.professordashboard.CourseOverviewCard.class;
+            }
             default -> {
                 throw new IllegalArgumentException("View not found: " + viewName);
             }
@@ -78,6 +95,9 @@ public class View {
             case "com.westums.views.AdminDashboard" -> {
                 return "Admin Dashboard";
             }
+            case "com.westums.views.ProfessorDashboard" -> {
+                return "Professor Dashboard";
+            }
             case "com.westums.views.admindashboard.AddStudentCard" -> {
                 return "Add Student";
             }
@@ -90,10 +110,12 @@ public class View {
             case "com.westums.views.admindashboard.AddEnrollmentCard" -> {
                 return "Add Enrollment";
             }
+            case "com.westums.views.professordashboard.CourseOverviewCard" -> {
+                return "Course Overview";
+            }
             default -> {
                 throw new IllegalArgumentException("View not found: " + viewClass.getName());
             }
         }
     }
-
 }

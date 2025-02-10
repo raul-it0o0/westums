@@ -17,7 +17,6 @@ public class AdminDashboardController implements TreeSelectionListener, MouseLis
 
     private static AdminDashboard view;
     private static MainFrame mainFrame;
-    ViewStudentsDialogController viewStudentsDialogController;
     static boolean ignoreTreeSelection = false;
 
     private static Object currentView = null;
@@ -143,7 +142,8 @@ public class AdminDashboardController implements TreeSelectionListener, MouseLis
         }
 
         // Check for modified fields in the current view
-        if (currentController != null) {
+        if (currentController != null && currentController != View.getController(View.IMPORT_DIALOG)) {
+
             try {
                 // Check if the fields are modified and valid
                 // NOTE: If fields are modified (filled) but not valid, changes are lost
@@ -185,7 +185,7 @@ public class AdminDashboardController implements TreeSelectionListener, MouseLis
                 show(View.IMPORT_DIALOG);
             }
             default -> {
-                view.showCard("Default Card");
+                view.showView("Default Card");
             }
         }
     }
@@ -193,7 +193,6 @@ public class AdminDashboardController implements TreeSelectionListener, MouseLis
     @Override
     public void mouseClicked(MouseEvent event) {
         if (event.getSource() == view.logoutPanel) {
-
             // Check for modified fields in the current view
             if (currentController != null) {
                 try {
@@ -218,7 +217,7 @@ public class AdminDashboardController implements TreeSelectionListener, MouseLis
             // to force re-instantiation when the user logs back in
             currentView = null;
             currentController = null;
-            MainController.show(View.LOGIN_PANEL);
+            MainController.show(View.LOGIN_PANEL, null);
         }
     }
 

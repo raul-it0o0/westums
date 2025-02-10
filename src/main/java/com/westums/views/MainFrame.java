@@ -1,7 +1,3 @@
-/*
- * Created by JFormDesigner on Fri Nov 29 19:56:29 EET 2024
- */
-
 package com.westums.views;
 
 import javax.swing.*;
@@ -29,8 +25,13 @@ public class MainFrame extends JFrame {
      * @return The view object that was added to the card layout.
      */
     public Object addView(String viewName) throws Exception {
+        Object view;
 
-        Object view = View.getViewClass(viewName).getConstructor().newInstance();
+        try {
+            view = View.getViewClass(viewName).getConstructor().newInstance();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         mainPanel.add((Component) view, viewName);
         return view;
     }
@@ -67,12 +68,8 @@ public class MainFrame extends JFrame {
         pack();
         setLocationRelativeTo(getOwner());
         setVisible(true);
-        // JFormDesigner - End of component initialization  //GEN-END:initComponents  @formatter:on
     }
 
-    // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables  @formatter:off
-    // Generated using JFormDesigner Educational license - Raul Ariton (raul.ariton05)
     private JPanel mainPanel;
     private CardLayout cardLayout;
-    // JFormDesigner - End of variables declaration  //GEN-END:variables  @formatter:on
 }

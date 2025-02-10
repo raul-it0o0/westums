@@ -25,10 +25,10 @@ public class MainController {
         }
 
         // Show the login panel as the first view
-        show(View.LOGIN_PANEL);
+        show(View.LOGIN_PANEL, null);
     }
 
-    public static void show(String viewName) {
+    public static void show(String viewName, Object object) {
 
         // Remove the current view from the card layout
         if (currentView != null) {
@@ -48,14 +48,21 @@ public class MainController {
             currentView = view.addView(viewName);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(view, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            return;
         }
 
         // Instantiate the view's controller
         // make the view visible
         try {
-            currentController = View.getController(viewName)
-                    .getConstructor(Container.class)
-                    .newInstance(((Container) currentView));
+            if (object != null) {
+                currentController = View.getController(viewName)
+                        .getConstructor(Container.class, Object.class)
+                        .newInstance(((Container) currentView), object);
+            } else {
+                currentController = View.getController(viewName)
+                        .getConstructor(Container.class)
+                        .newInstance(((Container) currentView));
+            }
             view.showView(viewName);
         } catch (Exception e) {
             // Exception will never be thrown

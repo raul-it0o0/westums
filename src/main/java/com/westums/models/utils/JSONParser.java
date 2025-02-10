@@ -40,13 +40,13 @@ public class JSONParser {
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(ALLOW_COMMENTS, true);
 
-        // NOTE: Throws IOException if file is not found
+        // Throws IOException if file is not found
         JsonNode root = mapper.readTree(jsonFile);
 
         // Attempt to get the date format
         // used to parse the date of birth from
         // String to Date
-        // NOTE: Throws IllegalArgumentException if pattern is invalid
+        // Throws IllegalArgumentException if pattern is invalid
         SimpleDateFormat sdf = new SimpleDateFormat(root.get("dateformat").asText());
 
         // Process professors

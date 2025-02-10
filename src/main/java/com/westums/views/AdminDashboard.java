@@ -1,7 +1,3 @@
-/*
- * Created by JFormDesigner on Wed Dec 04 12:42:21 EET 2024
- */
-
 package com.westums.views;
 
 import java.awt.*;
@@ -19,18 +15,15 @@ import net.miginfocom.swing.*;
 import org.kordamp.ikonli.fontawesome.FontAwesome;
 import org.kordamp.ikonli.swing.FontIcon;
 
-/**
- * @author Raul
- */
 public class AdminDashboard extends JPanel {
 
     public AdminDashboard() {
         initComponents();
     }
 
-    public void showCard(String cardName) {
-        cardLayout.show(formPanel, cardName);
-    }
+//    public void showCard(String cardName) {
+//        cardLayout.show(formPanel, cardName);
+//    }
 
     /**
      * Switches the view in the card layout to the one with the given name.
@@ -48,7 +41,6 @@ public class AdminDashboard extends JPanel {
      * @return The view object that was added to the card layout.
      */
     public Object addView(String viewName) throws Exception {
-
         Object view = View.getViewClass(viewName).getConstructor().newInstance();
         formPanel.add((Component) view, viewName);
         return view;
@@ -65,8 +57,6 @@ public class AdminDashboard extends JPanel {
     }
 
     private void initComponents() {
-        // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents  @formatter:off
-        // Generated using JFormDesigner Educational license - Raul Ariton (raul.ariton05)
         DefaultComponentFactory compFactory = DefaultComponentFactory.getInstance();
         menuPanel = new JPanel();
         menuHeader = new JLabel();
@@ -83,7 +73,6 @@ public class AdminDashboard extends JPanel {
         formPanel = new JPanel();
         defaultCard = new JPanel();
         chooseOptionMessage = new JTextPane();
-
 
         cardLayout = new CardLayout();
 
@@ -228,11 +217,8 @@ public class AdminDashboard extends JPanel {
             formPanel.add(defaultCard, "Default Card");
         }
         add(formPanel, "cell 1 0,width 410:410:410");
-        // JFormDesigner - End of component initialization  //GEN-END:initComponents  @formatter:on
     }
 
-    // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables  @formatter:off
-    // Generated using JFormDesigner Educational license - Raul Ariton (raul.ariton05)
     private JPanel menuPanel;
     private JLabel menuHeader;
     private JPopupMenu.Separator separator1;
@@ -247,20 +233,4 @@ public class AdminDashboard extends JPanel {
     public CardLayout cardLayout;
     private JPanel defaultCard;
     private JTextPane chooseOptionMessage;
-
-//    public JPanel addEnrollmentCard;
-//    private JPanel studentEnrollmentEmailPanel;
-//    private JLabel studentEnrollmentEmailLabel;
-//    public JXFormattedTextField studentEnrollmentEmailField;
-//    public JLabel studentEnrollmentEmailInvalidLabel;
-//    public JLabel studentEnrollmentEmailNotFoundLabel;
-//    public JLabel studentEnrollmentEmailFoundLabel;
-//    private JPanel refreshCourseListButtonPanel;
-//    public JButton refreshCourseListButton;
-//    public JScrollPane courseScrollPane;
-//    public DefaultListModel<Course> courseListModel;
-//    public JList<Course> courseList;
-//    private JPanel addEnrollmentButtonPanel;
-//    public JButton addEnrollmentButton;
-    // JFormDesigner - End of variables declaration  //GEN-END:variables  @formatter:on
 }
