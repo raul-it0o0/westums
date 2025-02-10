@@ -44,6 +44,7 @@ bin/
 ### Custom ###
 /src/main/java/com/westums/controllers/Controller.java
 /src/main/java/com/westums/views/designs/
+/src/main/resources/META-INF/*
 
 ### Unimplemented & Others ##
 /src/main/java/com/westums/controllers/admindashboard/ViewStudentsDialogController.java
