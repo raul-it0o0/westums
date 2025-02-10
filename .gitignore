@@ -41,11 +41,10 @@ bin/
 ### Mac OS ###
 .DS_Store
 
-### Custom ###
+### Unimplemented & Others ##
 /src/main/java/com/westums/controllers/Controller.java
 /src/main/java/com/westums/views/designs/
-
-### Unimplemented & Others ##
+/src/main/resources/META-INF/
 /src/main/java/com/westums/controllers/admindashboard/ViewStudentsDialogController.java
 src/main/java/com/westums/views/admindashboard/ViewStudentsDialog.java
 src/main/java/com/westums/models/StudentsTableModel.java
